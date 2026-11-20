@@ -248,7 +248,7 @@ python tests/pen_parity.py   # 和 JS 版笔的数值对照（没有 node 会跳
 
 ## 十、来龙去脉
 
-这套东西是照着"肥鱼画板"的思路重写的：那边是 JSON 几何 + 卡通化管线，
+这套东西是照着"肥鱼画板"（https://github.com/Aires-X/fat-fish-board）的思路重写的：那边是 JSON 几何 + 卡通化管线，
 这边是**文本 DSL + 自己的笔**。分四个阶段做的，每个阶段都有结论文档：
 
 - **M0** 笔：把 dsh-scribble 的笔逐位移植过来（`pen_parity.py` 证明逐位一致）
