@@ -1,0 +1,6 @@
+# 小飞鱼画板的依赖
+# 装：pip install -r requirements.txt
+# PySide6 是画图的核心（Qt 离屏渲染），另外两个是数值和读图
+PySide6>=6.5
+numpy>=1.24
+Pillow>=10.0
