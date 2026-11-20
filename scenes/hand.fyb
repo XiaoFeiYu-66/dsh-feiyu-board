@@ -1,0 +1,40 @@
+canvas 1280x900
+bg #F2ECDF
+
+# 由 tools/make_hand_volume.py 生成（体积法：掌是一块，手指盖上去）
+# 比例来自 hands.jpg：指长/掌高=0.78，食指=中指×0.86，小指=×0.64
+hand preset=pencil seed=77
+
+let 铅 = #3B342B
+let 淡 = #8A7F6E
+let 底 = #F2ECDF
+
+# ── 填充层（背景色，把被遮住的线吃掉）────────────────
+curve [525,538 511,604 530,720 557,902 725,902 755,714 760,591 750,538 580,522 640,514 695,524] fill=$底 closed
+curve [556,693 501,594 455,513 455,513 464,498 460,482 446,473 429,477 470,552 521,644] fill=$底 closed
+curve [533,566 529,447 525,361 520,305 520,305 526,292 539,286 552,292 558,305 569,361 581,447 581,566] fill=$底 closed
+curve [591,566 589,435 593,335 597,270 597,270 603,256 617,250 631,256 637,270 641,335 645,435 643,566] fill=$底 closed
+curve [653,566 652,444 664,355 674,298 674,298 680,284 693,279 706,284 712,298 708,355 705,444 701,566] fill=$底 closed
+curve [712,566 714,466 736,402 758,360 758,360 762,349 773,344 784,349 789,360 773,402 758,466 752,566] fill=$底 closed
+
+# ── 线稿层 ──────────────────────────────────────────
+curve [525,538 511,604 530,720 557,902 725,902 755,714 760,591 750,538] w=5.5 stroke=$铅 closed tex=paper tex_scale=0.4 jitter=0.45 taper=0
+curve [556,693 501,594 455,513 455,513 464,498 460,482 446,473 429,477 429,477 470,552 521,644] w=5 stroke=$铅 tex=paper tex_scale=0.4 jitter=0.45 taper=0
+curve [533,566 529,447 525,361 520,305 520,305 526,292 539,286 552,292 558,305 558,305 569,361 581,447 581,566] w=5 stroke=$铅 tex=paper tex_scale=0.4 jitter=0.45 taper=0
+curve [591,566 589,435 593,335 597,270 597,270 603,256 617,250 631,256 637,270 637,270 641,335 645,435 643,566] w=5 stroke=$铅 tex=paper tex_scale=0.4 jitter=0.45 taper=0
+curve [653,566 652,444 664,355 674,298 674,298 680,284 693,279 706,284 712,298 712,298 708,355 705,444 701,566] w=5 stroke=$铅 tex=paper tex_scale=0.4 jitter=0.45 taper=0
+curve [712,566 714,466 736,402 758,360 758,360 762,349 773,344 784,349 789,360 789,360 773,402 758,466 752,566] w=5 stroke=$铅 tex=paper tex_scale=0.4 jitter=0.45 taper=0
+
+# ── 指节与掌纹 ──────────────────────────────────────
+ink [536,458 562,454] w=2.5 color=$淡 tex=paper tex_scale=0.4 alpha=0.8 taper=0.5
+ink [536,394 562,389] w=2.5 color=$淡 tex=paper tex_scale=0.4 alpha=0.8 taper=0.5
+ink [604,448 630,443] w=2.5 color=$淡 tex=paper tex_scale=0.4 alpha=0.8 taper=0.5
+ink [604,373 630,368] w=2.5 color=$淡 tex=paper tex_scale=0.4 alpha=0.8 taper=0.5
+ink [671,456 697,451] w=2.5 color=$淡 tex=paper tex_scale=0.4 alpha=0.8 taper=0.5
+ink [671,390 697,384] w=2.5 color=$淡 tex=paper tex_scale=0.4 alpha=0.8 taper=0.5
+ink [738,475 764,470] w=2.5 color=$淡 tex=paper tex_scale=0.4 alpha=0.8 taper=0.5
+ink [738,427 764,422] w=2.5 color=$淡 tex=paper tex_scale=0.4 alpha=0.8 taper=0.5
+curve [562,675 635,655 709,667] w=3.5 stroke=$淡 tex=paper tex_scale=0.4 alpha=0.8 jitter=0.6
+curve [589,765 658,791 709,769] w=3 stroke=$淡 tex=paper tex_scale=0.4 alpha=0.7 jitter=0.6
+
+text 60,60 "手 · 第三张" 24 align=left color=$淡 hand=0.4

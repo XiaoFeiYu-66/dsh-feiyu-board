@@ -1,0 +1,55 @@
+canvas 1600x1000
+bg #F7F2E4
+
+# 三样新功能合起来用：
+#   嵌套 along —— 叶背上再摆边脉
+#   grad ref + p0/p1 —— 叶子里的体积，沿叶柄→叶尖过渡
+#   group alpha —— 顶端的嫩叶半透明，重叠处不叠深
+hand preset=pencil seed=31
+
+let 叶亮 = #9ACB4A
+let 叶暗 = #3E6B22
+let 枝色 = #6B5233
+let 墨 = #2E3A22
+
+# ── 枝 ──────────────────────────────────────────────
+curve [200,870 480,780 760,700 1040,630 1300,580 1420,566] \
+      fill=none stroke=none name=枝路
+curve [200,870 480,780 760,700 1040,630 1300,580 1420,566] \
+      w=15 stroke=$枝色 tex=paper tex_scale=0.5 taper=0.45
+
+# ── 一片叶：朝上长（+y 是叶尖），全在局部坐标里 ─────────
+group name=叶片 template=1
+  curve [-7,0 -26,-20 -31,-44 -17,-62 0,-70 17,-62 31,-44 26,-20 7,0] \
+        fill=$叶暗 closed name=叶形
+  grad ref=叶形 from=$叶暗 to=$叶亮 p0=[0,4] p1=[0,-68]
+  curve [0,-4 0,-62] w=2.2 stroke=#2F5420 alpha=0.5 taper=0.7
+  curve [-3,-14 3,-16] fill=none stroke=none name=脉路径
+  along ref=脉路径 group=小脉 count=1
+endgroup
+
+# 边脉：沿一小段斜线摆三道（内层 along，在外层模板的局部系里）
+group name=小脉 template=1
+  curve [0,0 -16,-9] w=1.5 stroke=#2F5420 alpha=0.38 taper=0.8
+endgroup
+
+# ── 朝上的叶 6 片、朝下的叶 5 片（错开，形成互生）─────────
+along ref=枝路 group=叶片 count=6 rot=1 scale=1.0
+group name=叶下 flip=y template=1
+  curve [-7,0 -26,-20 -31,-44 -17,-62 0,-70 17,-62 31,-44 26,-20 7,0] \
+        fill=$叶暗 closed name=叶形2
+  grad ref=叶形2 from=$叶暗 to=$叶亮 p0=[0,70] p1=[0,2]
+  curve [0,-4 0,-62] w=2.2 stroke=#2F5420 alpha=0.5 taper=0.7
+endgroup
+along ref=枝路 group=叶下 count=5 rot=1 scale=0.92
+
+# ── 顶端：一片半透明的嫩叶（group alpha + use）───────────
+# use 现在能把"含 along 的模板组"整个搬走，内层边脉跟着叶子走。
+group alpha=0.45
+  use 叶片 at=[1430,556] rot=16 scale=1.1
+endgroup
+
+# ── 枝的影子 ────────────────────────────────────────
+shadow ref=枝路 dx=5 dy=14 blur=20 alpha=0.15 color=#6B5233
+
+text 120,940 "果枝 · 小飞鱼" 30 align=left color=#7A6A4E hand=0.35

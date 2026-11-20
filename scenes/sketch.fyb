@@ -1,0 +1,39 @@
+canvas 1280x900
+bg #F5F1E6
+
+# 一张铅笔速写：所有线都是 tex=paper，暗部用 tex=dry 排线
+hand preset=pencil seed=21
+
+let 铅色 = #3A3733
+let 淡铅 = #8C857B
+
+# ── 桌子 ────────────────────────────────────────────
+ink [120,700 1160,700] w=3 color=$淡铅 tex=paper tex_scale=0.5
+ink [140,714 1140,712] w=2 color=$淡铅 tex=paper tex_scale=0.5 alpha=0.7
+
+# ── 杯子 ────────────────────────────────────────────
+curve [470,340 430,470 440,600 520,660 640,660 720,600 730,470 690,340] \
+      w=5 stroke=$铅色 tex=paper tex_scale=0.45
+# 杯口椭圆
+curve [470,340 520,300 600,290 660,300 690,340 660,372 600,382 520,372] \
+      w=5 stroke=$铅色 closed tex=paper tex_scale=0.45
+# 把手
+curve [726,420 800,404 842,452 846,520 812,566 750,570] w=5 stroke=$铅色 tex=paper tex_scale=0.45
+curve [742,440 792,432 818,470 818,516 794,548 752,552] w=4 stroke=$铅色 tex=paper tex_scale=0.45
+
+# ── 暗部排线（干笔）────────────────────────────────
+ink [500,620 640,632] w=3 color=$铅色 tex=dry tex_scale=0.4 alpha=0.55
+ink [512,646 660,652] w=3 color=$铅色 tex=dry tex_scale=0.4 alpha=0.5
+ink [560,600 690,592] w=2.5 color=$铅色 tex=dry tex_scale=0.4 alpha=0.45
+
+# ── 杯子里的水痕 ────────────────────────────────────
+curve [500,420 540,404 600,400 640,410] w=3 stroke=$淡铅 tex=paper tex_scale=0.5 alpha=0.8
+
+# ── 投影（排线，不是渐变）───────────────────────────
+ink [400,700 460,742] w=3 color=$淡铅 tex=paper tex_scale=0.5 alpha=0.6
+ink [480,700 540,748] w=3 color=$淡铅 tex=paper tex_scale=0.5 alpha=0.55
+ink [560,700 620,744] w=3 color=$淡铅 tex=paper tex_scale=0.5 alpha=0.5
+ink [640,700 700,738] w=3 color=$淡铅 tex=paper tex_scale=0.5 alpha=0.45
+ink [720,700 776,730] w=3 color=$淡铅 tex=paper tex_scale=0.5 alpha=0.4
+
+text 120,844 "杯子 · 铅笔稿" 26 align=left color=$淡铅 hand=0.4

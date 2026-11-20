@@ -1,0 +1,49 @@
+canvas 1920x1080
+bg #F6EFE2
+
+hand preset=ink seed=53
+
+# ── 伞面 ────────────────────────────────────────────
+shadow ref=canopy dx=26 dy=40 alpha=0.10
+
+# 伞杆 + 弯把：先画，伞面才盖得住它
+curve [960,300 960,560 960,690 952,742 930,772 900,776 882,758 886,732] \
+      w=9 stroke=#2B1A1A taper=0.05 jitter=0.3
+
+curve [520,520 620,400 760,320 960,300 1160,320 1300,400 1400,520 1290,556 \
+       1180,520 1070,556 960,520 850,556 740,520 630,556] \
+      fill=#C0504A closed name=canopy
+# 伞面的轮廓用笔描：又平滑又有手味（用 QPen 描会在尖角炸出毛刺）
+curve [520,520 620,400 760,320 960,300 1160,320 1300,400 1400,520 1290,556 \
+       1180,520 1070,556 960,520 850,556 740,520 630,556] \
+      w=8 stroke=#2B1A1A taper=0.08 jitter=0.45 closed
+
+# 伞骨
+ink [960,310 520,520] w=5 color=#5B2626 taper=0.25 jitter=0.5 overshoot=0
+ink [960,310 740,520] w=5 color=#5B2626 taper=0.25 jitter=0.5 overshoot=0
+ink [960,310 960,520] w=5 color=#5B2626 taper=0.25 jitter=0.5 overshoot=0
+ink [960,310 1180,520] w=5 color=#5B2626 taper=0.25 jitter=0.5 overshoot=0
+ink [960,310 1400,520] w=5 color=#5B2626 taper=0.25 jitter=0.5 overshoot=0
+
+# 伞尖
+ink [960,300 960,236] w=9 color=#2B1A1A taper=0.6
+
+# ── 地上的影子：一个扁椭圆，用排线填 ────────────────
+ellipse 960,1012,430,44 fill=none stroke=none name=gshadow
+hatch ref=gshadow angle=-12 spacing=20 w=3 color=#C4B49A alpha=0.85 taper=0.65 jitter=0.7
+
+# 地面线
+ink [380,1052 1560,1052] w=3 color=#A2937A taper=0.3 jitter=0.3
+
+# ── 落下的雨 ────────────────────────────────────────
+ink [380,180 396,268] w=4 color=#7FA3B8 alpha=0.8 taper=0.6
+ink [300,320 314,396] w=3 color=#7FA3B8 alpha=0.7 taper=0.6
+ink [1540,220 1556,312] w=4 color=#7FA3B8 alpha=0.8 taper=0.6
+ink [1620,380 1634,456] w=3 color=#7FA3B8 alpha=0.7 taper=0.6
+ink [240,560 256,650] w=4 color=#7FA3B8 alpha=0.7 taper=0.6
+ink [1660,620 1674,700] w=3 color=#7FA3B8 alpha=0.6 taper=0.6
+ink [250,760 264,846] w=3 color=#7FA3B8 alpha=0.55 taper=0.6
+ink [1650,820 1664,904] w=3 color=#7FA3B8 alpha=0.55 taper=0.6
+
+# ── 字 ──────────────────────────────────────────────
+text 1180,896 "没带伞的人，才懂伞" 32 align=left color=#6B5C48 hand=0.3

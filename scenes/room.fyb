@@ -1,0 +1,140 @@
+canvas 1920x1080
+bg #F6EFE2
+
+# 一点透视的小房间。灭点 (960,600)。
+# 参考 refs/room-construction.jpg：所有朝里的线都收在一点。
+# 后墙 (700,470)-(1220,740)；四个墙角沿过灭点的射线推到画布边 ——
+# 左墙前上 (0,120)   右墙前上 (1920,120)
+# 左墙前下 (69,1080) 右墙前下 (1851,1080)
+hand preset=ink seed=91
+
+let 墙亮 = #E9DDCA
+let 墙暗 = #D5C5AB
+let 后墙色 = #E2D4BE
+let 地色 = #C09468
+let 天花 = #F2EADA
+let 窗天 = #C6DCE8
+let 木深 = #8A6440
+let 线 = #6B5B47
+let 门色 = #B4895E
+let 地毯 = #8E4A38
+
+# ── 六个面 ──────────────────────────────────────────
+poly [0,0 1920,0 1920,120 1220,470 700,470 0,120] fill=$天花
+poly [700,470 1220,470 1220,740 700,740] fill=$后墙色
+poly [0,0 0,120 700,470 700,740 69,1080 0,1080] fill=$墙暗
+poly [1920,0 1920,120 1220,470 1220,740 1851,1080 1920,1080] fill=$墙亮
+poly [0,1080 69,1080 700,740 1220,740 1851,1080 1920,1080] fill=$地色 name=floor
+
+# ── 地板板缝 ────────────────────────────────────────
+clip floor
+  ink [120,1080 715,740] w=3 color=$木深 alpha=0.40 taper=0.3
+  ink [400,1080 797,740] w=3 color=$木深 alpha=0.38 taper=0.3
+  ink [700,1080 884,740] w=3 color=$木深 alpha=0.36 taper=0.3
+  ink [1100,1080 1001,740] w=3 color=$木深 alpha=0.36 taper=0.3
+  ink [1500,1080 1118,740] w=3 color=$木深 alpha=0.38 taper=0.3
+  ink [1800,1080 1205,740] w=3 color=$木深 alpha=0.40 taper=0.3
+  ink [40,1012 1880,1012] w=3 color=$木深 alpha=0.28 taper=0.4
+  ink [120,942 1800,942] w=3 color=$木深 alpha=0.24 taper=0.4
+  ink [230,872 1690,872] w=3 color=$木深 alpha=0.20 taper=0.4
+  ink [370,812 1550,812] w=3 color=$木深 alpha=0.16 taper=0.4
+endclip
+
+# ── 踢脚线：墙脚一条窄带，房间才"沉"得下去 ──────────
+poly [69,1080 700,740 700,722 69,1052] fill=#C6B393
+poly [1220,740 1851,1080 1851,1052 1220,722] fill=#CDBA9A
+ink [69,1052 700,722] w=2 color=$线 alpha=0.40 taper=0
+ink [1220,722 1851,1052] w=2 color=$线 alpha=0.40 taper=0
+
+# ── 左墙上的门（在墙平面里，同样收敛）────────────────
+poly [227,995 511,842 511,470 227,381] fill=#C9A87C
+poly [227,995 511,842 511,470 227,381] fill=none stroke=$线 width=6
+poly [239,975 499,830 499,492 239,412] fill=$门色
+poly [239,975 499,830 499,492 239,412] fill=none stroke=#8A6440 width=3
+circle 268,700,7 fill=#D9C08A
+circle 268,700,7 fill=none stroke=#8A6440 width=2
+ink [230,993 508,842] w=3 color=$线 alpha=0.45 taper=0
+
+# ── 右墙上的画 ──────────────────────────────────────
+poly [1630,875 1472,810 1472,576 1630,566] fill=#F0E6D2
+poly [1630,875 1472,810 1472,576 1630,566] fill=none stroke=$线 width=7
+poly [1606,855 1494,806 1494,600 1606,592] fill=#8FA9A0
+poly [1606,855 1494,806 1494,600 1606,592] fill=none stroke=$线 width=3
+
+# ── 后墙上的窗 ───────────────────────────────────────
+rect 790,505,320,195 fill=$窗天
+rect 790,505,320,195 fill=none stroke=$线 width=6
+ink [950,505 950,700] w=5 color=$线 taper=0
+ink [790,602 1110,602] w=5 color=$线 taper=0
+rect 780,700,340,10 fill=#DCCDB4
+
+# ── 吊灯：填住天花板中间那块空，也给个光源 ──────────
+ink [960,0 960,330] w=4 color=$线 taper=0
+poly [902,330 1018,330 1048,404 872,404] fill=#C9B58C
+poly [902,330 1018,330 1048,404 872,404] fill=none stroke=$线 width=5
+ellipse 960,404,88,16 fill=#F2D9A0
+blend screen
+  blur 40
+    ellipse 960,430,120,50 fill=#FFE9B8 alpha=0.35
+  endblur
+endblend
+
+# ── 地上的地毯（桌下）────────────────────────────────
+poly [360,1080 1560,1080 1380,906 540,906] fill=$地毯 name=rug
+poly [360,1080 1560,1080 1380,906 540,906] fill=none stroke=#6E3728 width=6
+poly [400,1058 1520,1058 1352,922 572,922] fill=none stroke=#C98C74 width=3
+hatch ref=rug angle=-8 spacing=16 w=2.5 color=#6E3728 alpha=0.35 taper=0.6 jitter=0.5
+
+# ── 窗光落在地上：软边的一大块亮 ────────────────────
+blend screen
+  blur 46
+    poly [800,742 1100,742 1440,1080 540,1080] fill=#FFF0C4 alpha=0.85
+  endblur
+  blur 30
+    poly [760,742 1140,742 1240,900 660,900] fill=#FFF9DE alpha=0.55
+  endblur
+  blur 60
+    poly [1220,470 1920,120 1920,1080 1400,1080 1220,740] fill=#FFF6E0 alpha=0.22
+  endblur
+endblend
+
+# ── 窗格的影子投在地上 ──────────────────────────────
+blend multiply
+  blur 12
+    poly [938,742 962,742 986,1080 930,1080] fill=#8A6440 alpha=0.35
+    poly [700,872 1300,872 1300,896 700,896] fill=#8A6440 alpha=0.30
+  endblur
+endblend
+
+# ── 桌 ──────────────────────────────────────────────
+shadow ref=tabletop dx=0 dy=14 blur=24 alpha=0.30 color=#5E4428
+blur 34
+  ellipse 970,1050,380,58 fill=#5E4428 alpha=0.42
+endblur
+poly [620,1000 1320,1000 1260,880 700,880] fill=#D9B98C name=tabletop
+poly [620,1000 1320,1000 1320,1022 620,1022] fill=#B98F63
+poly [652,1022 690,1022 690,1080 652,1080] fill=#A87F52
+poly [1250,1022 1288,1022 1288,1080 1250,1080] fill=#A87F52
+poly [734,880 766,880 766,948 734,948] fill=#A87F52
+poly [1194,880 1226,880 1226,948 1194,948] fill=#A87F52
+
+# ── 桌上：一碟橘子 ──────────────────────────────────
+shadow ref=dish dx=30 dy=18 blur=22 alpha=0.34 color=#5E4428
+ellipse 1010,936,170,48 fill=#EFE3CB name=dish
+ellipse 1010,936,170,48 fill=none stroke=#C7B391 width=5
+circle 940,916,42 fill=#F0561C
+circle 940,916,42 fill=none stroke=#B8391A width=3
+circle 1084,920,36 fill=#F0742E
+circle 1084,920,36 fill=none stroke=#B8391A width=3
+circle 1006,888,38 fill=#E8661F
+circle 1006,888,38 fill=none stroke=#B8391A width=3
+circle 926,900,11 fill=#FFC98A alpha=0.55
+circle 1072,906,9 fill=#FFC98A alpha=0.5
+circle 994,874,10 fill=#FFC98A alpha=0.5
+curve [846,940 1010,1000 1174,940] w=6 stroke=#C7B391 taper=0.2
+
+# ── 明暗：左右边缘收一点 ────────────────────────────
+blend multiply
+  grad rect 0,0,380,1080 from=#6B5B4730 to=#6B5B4700 dir=0
+  grad rect 1540,0,380,1080 from=#6B5B4730 to=#6B5B4700 dir=180
+endblend

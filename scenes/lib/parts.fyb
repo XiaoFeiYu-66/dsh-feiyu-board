@@ -1,0 +1,17 @@
+﻿# 小飞鱼画板 · 共用零件库
+# 用法：场景里 include "lib/parts.fyb"；场景里再写一次 let 就能覆盖这里的值。
+
+let 叶绿 = #6FB92F
+let 叶暗 = #4E8F1F
+let 叶脉色 = #A8D94E
+let 孔色 = #A8130A
+
+# 果皮气孔
+def 气孔 (x, y, r, a)
+  circle $x,$y,$r fill=$孔色 alpha=$a
+enddef
+
+# 叶脉：一道带手味的细线
+def 叶脉线 (pts, w)
+  ink $pts w=$w color=$叶脉色 alpha=0.85 taper=0.5
+enddef

@@ -1,0 +1,54 @@
+canvas 1000x1200
+bg #FBF7F0
+
+# 照参考图第三行的牛奶盒。
+#
+# 走过弯路：我先给盒子加了右侧面做 2.5D，结果屋顶、侧面、耳朵互相打架。
+# 回头对比参考图 —— 它是**平的**，没有侧面，就一个正面 + 屋顶梯形。
+# 跟杯子和灯笼一样，这套图的语言是"扁平图标"，不是立体图。
+hand preset=brush seed=91
+
+let 线 = #3B2E27
+let 白 = #FAF7F0
+let 蓝 = #9DB8D2
+let 腮红 = #F4B0A4
+
+group at=[470,610]
+
+  # 0) 耳朵先画 —— 它要"从盒子后面支出来"，画在屋顶后面才对。
+  #    放在最后画会盖住屋顶，看着像贴在盒子上（第四版就是这样）。
+  poly [-150,-118 -92,-118 -170,-206] fill=$白 stroke=$线 w=8 closed
+  poly [92,-118 150,-118 170,-206] fill=$白 stroke=$线 w=8 closed
+  poly [-146,-126 -110,-126 -156,-188] fill=$腮红 alpha=0.6
+  poly [110,-126 146,-126 156,-188] fill=$腮红 alpha=0.6
+
+  # 1) 屋顶：梯形（下宽上窄），顶上再压一条封口横片
+  poly [-150,-116 150,-116 92,-186 -92,-186] fill=$白 stroke=none name=杆
+  rect -92,-208,184,24 fill=$蓝 stroke=none name=封口
+
+  # 2) 盒身
+  rect -150,-116,300,326 fill=$白 stroke=none name=身
+
+  # 3) 蓝带子
+  rect -150,44,300,78 fill=$蓝 stroke=none
+
+  # 4) 描边（先形体后细节）
+  poly [-150,-116 150,-116 92,-186 -92,-186] fill=none stroke=$线 w=9 closed
+  rect -92,-208,184,24 fill=none stroke=$线 width=8
+  rect -150,-116,300,326 fill=none stroke=$线 width=10
+
+  # 5) 脸
+  ellipse -58,-6,12,17 fill=$线
+  ellipse 58,-6,12,17 fill=$线
+  curve [-24,30 -6,44 24,28] w=7 stroke=$线 taper=0.3
+  ellipse -104,22,22,11 fill=$腮红 alpha=0.7
+  ellipse 104,22,22,11 fill=$腮红 alpha=0.7
+
+  # 6) MILK
+  text 0,98 "MILK" 50 align=center color=#FFFFFF font="Segoe UI" tracking=0.06
+
+endgroup
+
+shadow ref=身 dx=8 dy=22 blur=34 alpha=0.16 color=#8A6B4A
+
+text 60,1130 "牛奶盒 · 照参考图" 26 align=left color=#8A7360 hand=0.3

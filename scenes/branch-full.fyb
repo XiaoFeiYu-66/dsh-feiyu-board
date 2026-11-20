@@ -1,0 +1,78 @@
+canvas 1100x1400
+bg #FDFCF8
+
+# 照参考图第四格的彩色树枝（第二版：按 fyb balance 的体检结果重新构图）。
+#
+# 第一版覆盖率只有 6.5%，12 格里有 6 格空着 —— 整株缩在横画布中间。
+# 复查发现根子在**画幅**：这是一株竖着长的东西，画布却是横向的。
+# 所以这版换成竖幅 1000×1400，整株按包围盒放大到 1.5 倍，
+# 左下角补一枝小的，右上角留一点落下的叶。
+hand preset=pencil seed=53
+
+let 线 = #4A3527
+let 枝 = #9A6134
+let 枝亮 = #B87C4A
+let 枝暗 = #6E4322
+let 叶背 = #5E9B33
+let 叶亮 = #C2E06E
+let 脉 = #3F6B23
+
+# ── 叶子模板：朝上（尖端在 0,-100），基部收细 ──────────
+group name=叶 template=1
+  curve [0,0 -18,-14 -30,-40 -31,-64 -19,-84 0,-100 19,-84 31,-64 30,-40 18,-14] \
+        fill=$叶背 stroke=none closed name=叶形
+  grad ref=叶形 from=$叶亮 to=$叶背 p0=[0,-96] p1=[0,6]
+
+  curve [0,-14 0,-86] fill=none stroke=none name=主脉路
+  along ref=主脉路 group=侧脉 count=4 rot=1
+  curve [0,-6 1,-50 0,-94] w=1.6 stroke=#2F5A1E alpha=0.8 taper=0.2
+  curve [0,0 0,14] w=4 stroke=$枝暗 taper=0.3
+  curve [0,0 -18,-14 -30,-40 -31,-64 -19,-84 0,-100 19,-84 31,-64 30,-40 18,-14] \
+        fill=none stroke=$线 w=3 closed
+endgroup
+
+group name=侧脉 template=1
+  curve [0,0 -12,-20] w=3.6 stroke=#2F5A1E alpha=0.85 taper=0.7
+  curve [0,0 -12,20] w=3.6 stroke=#2F5A1E alpha=0.85 taper=0.7
+endgroup
+
+# ── 整株（模板，不直接画）────────────────────────────
+group name=株 template=1
+  # 枝干：抖动压到 0.15，不然粗笔会抖成面条
+  curve [430,890 520,720 600,600 672,500 722,428] w=40 stroke=$枝 jitter=0.12 taper=0.3
+  curve [700,455 780,362 822,300] w=22 stroke=$枝 jitter=0.15 taper=0.4
+  curve [618,570 762,612 902,600] w=20 stroke=$枝 jitter=0.15 taper=0.4
+  curve [520,700 452,642 424,592] w=11 stroke=$枝 jitter=0.15 taper=0.5
+
+  # 亮面与暗面：沿主干偏一侧各压一道，木头才有圆柱感
+  curve [446,884 530,716 606,596 676,498] w=12 stroke=$枝亮 alpha=0.45 \
+        jitter=0.15 taper=0.4
+  curve [412,896 504,724 588,606 664,504] w=10 stroke=$枝暗 alpha=0.35 \
+        jitter=0.15 taper=0.4
+
+  ellipse 422,584,11,20 fill=#93B04E stroke=$线 width=3
+  ellipse 826,296,11,19 fill=#93B04E stroke=$线 width=3
+  ellipse 906,596,10,18 fill=#93B04E stroke=$线 width=3
+
+  # 五片叶：底部两片先画（被枝压住），上面的后画
+  use 叶 at=[760,632] rot=118 scale=1.7
+  use 叶 at=[918,588] rot=92 scale=1.75
+  use 叶 at=[736,362] rot=-32 scale=1.75
+  use 叶 at=[822,300] rot=12 scale=1.8
+  use 叶 at=[884,432] rot=54 scale=1.6
+endgroup
+
+# ── 主株：放大 1.5 倍居中（包围盒 x 97~904，y 235~1165，都在画布内）──
+use 株 at=[-465,-120] scale=1.36
+
+# ── 顶上垂下来一片，把上沿的空白压住 ───────────────────
+
+
+# ── 影子 ────────────────────────────────────────────
+shadow ref=叶形 dx=8 dy=18 blur=22 alpha=0.10 color=#6B4A2A
+
+# ── 题签区（标本版式：下面三分之一留给题签，不是没画完）─────
+curve [70,1150 1030,1150] w=1.6 stroke=#B8A891 alpha=0.9 jitter=0.25
+text 70,1210 "树枝" 52 align=left color=#4A3527 hand=0.35
+text 70,1270 "照参考图重画" 24 align=left color=#8A7360 hand=0.3
+text 70,1312 "按 fyb balance 的覆盖率体检重排 · 竖幅标本版式" 20 align=left color=#A99C88 hand=0.25

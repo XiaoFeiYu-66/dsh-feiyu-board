@@ -1,0 +1,64 @@
+# 我的第一张：鲸鱼游过去，后面跟着一个很小的人（第三版）
+canvas 1920x1080
+bg #05101A
+grad rect 0,0,1920,1080 from=#0E2A40 to=#030C14 dir=90
+
+# 光柱
+poly [1420,0 1610,0 1750,1080 1500,1080] fill=none stroke=none name=beam1
+poly [1680,0 1790,0 1900,1080 1790,1080] fill=none stroke=none name=beam2
+blend screen
+  grad ref=beam1 from=#8FD0F088 to=#8FD0F000 p0=[1500,0] p1=[1650,1080]
+  grad ref=beam2 from=#8FD0F055 to=#8FD0F000 p0=[1730,0] p1=[1850,1080]
+endblend
+
+# 尾（圆一点的尾鳍）
+curve [1080,520 1200,424 1300,452 1262,548 1300,644 1200,672 1080,616 1052,568] closed fill=#1F5484 name=tail
+grad ref=tail from=#2E6FA6AA to=#14405EAA p0=[1220,430] p1=[1240,660]
+
+# 身体
+ellipse 700,540,382,214 fill=#255F94 name=body
+grad ref=body from=#4A93CF88 to=#0F3150AA p0=[900,300] p1=[480,780]
+
+# 肚皮
+clip body
+  ellipse 660,652,300,148 fill=#CFE3F7 alpha=0.42
+  grad ref=body from=#00000000 to=#0B2438AA p0=[700,380] p1=[700,760]
+endclip
+
+# 胸鳍
+curve [900,700 1030,772 1150,748 1040,692] fill=#1B4A74
+
+# 眼
+circle 452,500,14 fill=#091624
+circle 447,494,5 fill=#DCEBFA
+
+# 嘴线
+ink [400,588 486,610 566,600] w=6.5 color=#17395A taper=0.45 jitter=0.5
+
+# 背上的光斑（顺着脊线，淡淡一道）
+ink [660,392 800,374 950,392] w=9 color=#9FD4F5 alpha=0.16 taper=0.9
+
+# 气泡
+circle 1262,660,7 fill=#BFE3FF alpha=0.3
+circle 1300,612,5 fill=#BFE3FF alpha=0.24
+circle 1240,586,4 fill=#BFE3FF alpha=0.18
+
+# 很小的人，跟在鲸鱼后面
+group at=[1520,752] scale=0.55
+  circle 0,-70,25 fill=#08121C
+  rect -19,-46,38,86 r=9 fill=#08121C
+  rect -15,40,12,62 fill=#08121C
+  rect 4,40,12,62 fill=#08121C
+  blend screen
+    circle -33,4,22 fill=#FFC98A55
+    circle -33,4,7 fill=#FFE2BCCC
+  endblend
+endgroup
+
+# 跟在后面的一串小气泡，说明"跟着"
+circle 1436,806,5 fill=#BFE3FF alpha=0.34
+circle 1390,846,4 fill=#BFE3FF alpha=0.26
+circle 1352,880,3 fill=#BFE3FF alpha=0.18
+
+# 暗角
+grad circle 960,560,1180 from=#00000000 to=#000000AA

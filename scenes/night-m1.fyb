@@ -1,0 +1,37 @@
+canvas 1920x1080
+bg #0A1826
+
+# 月亮
+circle 1450,140,66 fill=#F6F0D6
+circle 1450,140,51 fill=#FFFBEA
+
+# 月光斜插下来（两片半透明多边形）
+poly [1210,-46 1300,-46 930,1180 780,1180] fill=#BFE8FF alpha=0.10
+poly [1350,-46 1400,-46 1120,1180 1040,1180] fill=#BFE8FF alpha=0.06
+
+# 鲸鱼：一条闭合弧（上缘去、下缘回）
+group whale at=[0,0]
+  curve [480,720 520,660 590,615 680,585 780,570 880,570 990,585 1090,615 \
+         1180,660 1250,715 1290,770 1260,820 1170,860 1050,880 920,885 \
+         790,878 680,858 600,830 530,790 488,745] \
+        fill=#16334A closed
+  ink [480,712 540,646 620,602 720,577 830,570 950,580 1070,612 1170,660 1250,714 1292,768] \
+      w=9 color=#7FD3F7 taper=0.5 rough=1.1 overshoot=10 jitter=0.5 step=5
+  ink [500,760 560,800 640,824 700,832] w=4.5 color=#2A4E6B rough=1.3
+endgroup
+
+# 水下的波纹
+ink [140,960 260,930 400,962 540,932 680,964 820,934 960,966 1100,936 1240,964] \
+    w=5 color=#2C6E9E jitter=0.35 taper=0.3 rough=1.0
+ink [200,1010 330,984 470,1012 610,986 750,1014 890,988 1030,1016 1170,990] \
+    w=3.5 color=#22587F jitter=0.3 taper=0.3 rough=1.0
+
+# 水里漂的碎光
+circle 260,180,3 fill=#CFEFFF alpha=0.35
+circle 640,120,4 fill=#CFEFFF alpha=0.3
+circle 1040,300,3 fill=#CFEFFF alpha=0.28
+circle 380,640,3 fill=#CFEFFF alpha=0.25
+circle 1700,620,3 fill=#CFEFFF alpha=0.22
+
+text 96,140 "夜里的海" 44 align=left color=#E8F4FF
+text 98,182 "2026-11-17 · 小飞鱼" 22 align=left color=#7FA8C9

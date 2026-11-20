@@ -1,0 +1,79 @@
+﻿canvas 1600x1000
+bg #FDFCF8
+
+# 照参考图第四格的彩色树枝。这是写实植物插画，不是扁平图标。
+#
+# 第一版踩了两条：
+#   1. 枝干用了 pencil 的默认抖动（0.62），粗笔一抖就成了面条 → 枝干要单独压到 0.15
+#   2. 叶子按 96px 画，在 1600 的画布上只有一点点大 → 叶子要放大到 180px
+hand preset=pencil seed=53
+
+let 线 = #4A3527
+let 枝 = #9A6134
+let 枝亮 = #B87C4A
+let 枝暗 = #6E4322
+let 叶背 = #5E9B33
+let 叶亮 = #C2E06E
+let 脉 = #3F6B23
+
+# ── 叶子模板：朝上（尖端在 0,-100），基部收细 ──────────
+group name=叶 template=1
+  curve [0,0 -18,-14 -30,-40 -31,-64 -19,-84 0,-100 19,-84 31,-64 30,-40 18,-14] \
+        fill=$叶背 stroke=none closed name=叶形
+  grad ref=叶形 from=$叶亮 to=$叶背 p0=[0,-96] p1=[0,6]
+
+  # 侧脉：沿主脉摆四对，做成 V
+  curve [0,-14 0,-86] fill=none stroke=none name=主脉路
+  along ref=主脉路 group=侧脉 count=4 rot=1
+
+  # 主脉
+  curve [0,-6 1,-50 0,-94] w=1.6 stroke=#2F5A1E alpha=0.8 taper=0.2
+
+  # 叶柄
+  curve [0,0 0,14] w=4 stroke=$枝暗 taper=0.3
+
+  # 轮廓
+  curve [0,0 -18,-14 -30,-40 -31,-64 -19,-84 0,-100 19,-84 31,-64 30,-40 18,-14] \
+        fill=none stroke=$线 w=3 closed
+endgroup
+
+# 侧脉模板：一对斜线
+group name=侧脉 template=1
+  # rot=1 时模板的 +x 会对齐主脉方向，所以脉要写成**纵向**（±y），
+  # 转过去才变成横向的鱼骨；写成 ±x 的话会跟主脉平行。
+  curve [0,0 -12,-20] w=3.6 stroke=#2F5A1E alpha=0.85 taper=0.7
+  curve [0,0 -12,20] w=3.6 stroke=#2F5A1E alpha=0.85 taper=0.7
+endgroup
+
+# ── 枝干：抖动压到 0.15，不然粗笔会抖成面条 ─────────────
+curve [430,890 520,720 600,600 672,500 722,428] \
+      w=40 stroke=$枝 jitter=0.12 taper=0.3
+curve [700,455 780,362 822,300] w=22 stroke=$枝 \
+      jitter=0.15 taper=0.4
+curve [618,570 762,612 902,600] w=20 stroke=$枝 \
+      jitter=0.15 taper=0.4
+curve [520,700 452,642 424,592] w=11 stroke=$枝 \
+      jitter=0.15 taper=0.5
+
+# 枝干的亮面与暗面：沿主干偏一侧各压一道，木头才有圆柱感
+curve [446,884 530,716 606,596 676,498] w=12 stroke=$枝亮 alpha=0.45 \
+      jitter=0.15 taper=0.4
+curve [412,896 504,724 588,606 664,504] w=10 stroke=$枝暗 alpha=0.35 \
+      jitter=0.15 taper=0.4
+
+# ── 芽 ──────────────────────────────────────────────
+ellipse 422,584,11,20 fill=#93B04E stroke=$线 width=3
+ellipse 826,296,11,19 fill=#93B04E stroke=$线 width=3
+ellipse 906,596,10,18 fill=#93B04E stroke=$线 width=3
+
+# ── 五片叶：底部两片先画（被枝压住），上面的后画 ────────
+use 叶 at=[760,632] rot=118 scale=1.7
+use 叶 at=[918,588] rot=92 scale=1.75
+use 叶 at=[736,362] rot=-32 scale=1.75
+use 叶 at=[822,300] rot=12 scale=1.8
+use 叶 at=[884,432] rot=54 scale=1.6
+
+# ── 影子 ────────────────────────────────────────────
+shadow ref=叶形 dx=8 dy=18 blur=22 alpha=0.10 color=#6B4A2A
+
+text 90,930 "树枝 · 照参考图" 26 align=left color=#8A7360 hand=0.3

@@ -1,0 +1,62 @@
+canvas 1920x1080
+bg #FBF5E9
+
+hand preset=ink seed=88
+
+# 绕 (960,540) 放大 12% —— 不用再自己算 at = C*(1-s)
+group about=[960,540] scale=1.12
+
+curve [960,196 1160,232 1290,360 1310,560 1260,740 1120,830 960,850 800,830 \
+       660,740 610,560 630,360 760,232] fill=#2B4A80 closed name=hairback
+hatch ref=hairback angle=-58 spacing=30 w=4 color=#1E355E alpha=0.30 taper=0.5 jitter=0.8
+
+curve [660,500 540,470 470,360 520,318 610,382 690,440] fill=#3C6BA8 closed
+curve [1260,500 1380,470 1450,360 1400,318 1310,382 1230,440] fill=#3C6BA8 closed
+ink [600,440 540,372] w=4 color=#C6DCF2 taper=0.6
+ink [562,470 508,404] w=4 color=#C6DCF2 taper=0.6
+ink [1320,440 1380,372] w=4 color=#C6DCF2 taper=0.6
+ink [1358,470 1412,404] w=4 color=#C6DCF2 taper=0.6
+
+rect 906,760,108,140 fill=#F3D2BE
+
+ellipse 960,570,238,250 fill=#FCE3D2
+
+curve [716,520 726,378 830,306 960,290 1090,306 1194,378 1204,520 1140,470 \
+       1070,516 990,470 930,516 850,470 770,510] fill=#33619E closed
+ink [900,300 880,380] w=6 color=#2B4A80 taper=0.5 alpha=0.6
+ink [1020,300 1040,380] w=6 color=#2B4A80 taper=0.5 alpha=0.6
+
+# 头饰：一条发际线 + 沿它排一串白褶（原来是五个手算的椭圆）
+curve [742,330 820,264 960,242 1100,264 1178,330] fill=none stroke=none name=hairline
+group name=frill template=1
+  ellipse 0,0,32,26 fill=#FFFFFF
+endgroup
+along ref=hairline group=frill count=7
+
+poly [716,330 668,298 676,352] fill=#2B4A80
+poly [716,330 762,298 756,352] fill=#2B4A80
+circle 716,330,13 fill=#1E355E
+poly [1204,330 1156,298 1164,352] fill=#2B4A80
+poly [1204,330 1250,298 1244,352] fill=#2B4A80
+circle 1204,330,13 fill=#1E355E
+
+ink [826,560 878,522 930,560] w=10 color=#2A2A2A taper=0.3 jitter=0.5
+ink [990,560 1042,522 1094,560] w=10 color=#2A2A2A taper=0.3 jitter=0.5
+ellipse 812,636,50,30 fill=#F6A1A8 alpha=0.5
+ellipse 1108,636,50,30 fill=#F6A1A8 alpha=0.5
+curve [924,628 960,620 996,628 990,668 960,682 930,668] fill=#C4576B closed
+ellipse 960,672,22,13 fill=#F07A8C
+
+curve [960,880 1150,900 1260,980 1290,1080 630,1080 660,980 770,900] \
+      fill=#2B3E68 closed
+curve [872,884 960,930 1048,884 1048,962 960,1000 872,962] fill=#FFFFFF closed
+ink [872,922 960,972 1048,922] w=5 color=#2B3E68 taper=0.4
+
+ellipse 690,742,80,72 fill=#FCE3D2
+ellipse 690,676,62,50 fill=#FCE3D2
+ink [620,748 662,758] w=5 color=#E2B49E taper=0.5
+ink [628,712 666,724] w=5 color=#E2B49E taper=0.5
+
+endgroup
+
+text 1500,1010 "好耶" 56 align=left color=#2B4A80 hand=0.35

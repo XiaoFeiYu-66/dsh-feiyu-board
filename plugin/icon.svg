@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="小飞鱼画板">
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="#16233a"/>
+  <path d="M14 34c0-8 7-13 16-13 6 0 10 2 13 5l6-6v28l-6-6c-3 3-7 5-13 5-9 0-16-5-16-13z" fill="#7fd3f7"/>
+  <circle cx="24" cy="31" r="3" fill="#16233a"/>
+  <path d="M34 40c4 0 7-1 9-3" stroke="#16233a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M46 14c3 4 4 7 4 11" stroke="#ffd98a" stroke-width="3" fill="none" stroke-linecap="round"/>
+</svg>

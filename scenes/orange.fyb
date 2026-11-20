@@ -1,0 +1,80 @@
+canvas 1024x1024
+bg #FDFDFB
+
+hand preset=ink seed=41
+
+# ── 果身 ────────────────────────────────────────────
+circle 490,570,305 fill=#F0561C name=body
+
+clip body
+  # 上明下暗：从橙黄压到深红
+  grad rect 185,265,610,610 from=#FFA62E to=#D4240C dir=90
+
+  # 上半的亮块
+  curve [300,300 380,282 460,296 520,330 480,372 400,382 330,352] fill=#FFC24A alpha=0.32
+  curve [430,336 500,318 570,330 600,368 560,398 480,402 428,376] fill=#FFB63C alpha=0.26
+
+  # 下半的暗红斑块
+  curve [232,556 320,516 420,538 472,600 430,682 320,700 248,650] fill=#C0140A alpha=0.30
+  curve [400,600 500,570 610,592 660,660 610,746 490,760 410,700] fill=#C0140A alpha=0.26
+  curve [600,470 700,452 760,500 770,580 720,634 640,620 596,552] fill=#C8170A alpha=0.22
+  curve [250,700 350,690 430,730 440,800 360,846 270,820] fill=#B8120A alpha=0.22
+
+  # 气孔：小圆点
+  circle 300,470,7 fill=#A8130A alpha=0.22
+  circle 360,520,6 fill=#A8130A alpha=0.20
+  circle 420,470,5 fill=#A8130A alpha=0.18
+  circle 300,616,6 fill=#A8130A alpha=0.24
+  circle 390,560,8 fill=#A8130A alpha=0.20
+  circle 470,650,6 fill=#A8130A alpha=0.22
+  circle 560,500,7 fill=#A8130A alpha=0.18
+  circle 600,560,6 fill=#A8130A alpha=0.22
+  circle 660,610,7 fill=#A8130A alpha=0.20
+  circle 520,720,7 fill=#A8130A alpha=0.22
+  circle 610,700,5 fill=#A8130A alpha=0.18
+  circle 400,760,6 fill=#A8130A alpha=0.20
+  circle 340,420,5 fill=#A8130A alpha=0.16
+  circle 680,540,5 fill=#A8130A alpha=0.16
+  circle 500,420,6 fill=#A8130A alpha=0.16
+  circle 260,520,5 fill=#A8130A alpha=0.18
+
+  # 右侧边缘光（月牙）
+  curve [770,380 796,470 792,600 756,720 736,700 768,590 772,470 752,400] \
+        fill=#FFC93C alpha=0.55
+endclip
+
+# ── 左侧两道奶油色高光（顺着球面走弧，不是两根棍）──
+curve [234,354 208,420 204,486 214,540 236,580] w=24 stroke=#FFE3B4 taper=0.5 jitter=0.25
+curve [298,350 284,404 280,462 288,512 304,548] w=12 stroke=#FFEFD2 taper=0.55 jitter=0.25
+
+# ── 花萼（绿色五瓣）────────────────────────────────
+curve [505,300 529,340 579,348 543,384 551,435 505,412 459,435 467,384 \
+       431,348 481,340] fill=#6FB92F closed
+curve [505,330 519,352 545,356 525,376 530,402 505,392 480,402 485,376 \
+       465,356 491,352] fill=#4E8F1F alpha=0.55 closed
+
+# 萼片上的短皱纹（只贴着花萼边，不能伸到果皮上当须）
+ink [505,418 505,446] w=3 color=#4E8F1F alpha=0.45 taper=0.7
+ink [466,404 442,420] w=3 color=#4E8F1F alpha=0.45 taper=0.7
+ink [544,404 568,420] w=3 color=#4E8F1F alpha=0.45 taper=0.7
+ink [436,344 418,332] w=3 color=#4E8F1F alpha=0.35 taper=0.7
+ink [574,344 592,332] w=3 color=#4E8F1F alpha=0.35 taper=0.7
+
+# ── 果柄 ────────────────────────────────────────────
+curve [508,404 504,344 506,288 514,236] w=21 stroke=#66AD33 taper=0.12 jitter=0.3
+ink [502,392 499,320 504,250] w=6 color=#8FD24A alpha=0.75 taper=0.5
+ink [516,380 517,300 522,244] w=5 color=#4E8F1F alpha=0.55 taper=0.5
+
+# ── 小叶子（右上，用细柄接在果柄上）──────────────────
+ink [520,224 542,232 556,236] w=4 color=#66AD33 alpha=0.9 taper=0.5
+curve [552,232 574,196 630,168 700,160 698,188 646,220 590,244] fill=#7FC241 closed
+ink [570,228 624,194 688,172] w=3 color=#A8D94E alpha=0.85 taper=0.5
+ink [570,228 604,212 650,204] w=2.5 color=#4E8F1F alpha=0.5 taper=0.5
+
+# ── 大叶子（右，尖头指向右下）──────────────────────
+curve [626,292 668,266 720,266 776,300 820,356 848,444 802,430 748,404 \
+       700,372 656,334] fill=#6FB92F closed
+ink [642,300 700,332 762,378 826,432] w=3.5 color=#A8D94E alpha=0.9 taper=0.5
+ink [664,282 704,296 744,302] w=2.5 color=#4E8F1F alpha=0.45 taper=0.6
+ink [702,344 728,370] w=2.5 color=#4E8F1F alpha=0.45 taper=0.6
+ink [754,380 784,402] w=2.5 color=#4E8F1F alpha=0.45 taper=0.6

@@ -1,0 +1,21 @@
+canvas 1200x1200
+bg #F2ECDF
+
+# 临摹：refs/hands.jpg 左上那只手，按原图像素逐点描，坐标由 tools/trace_hand.py 换算
+# 对照用：python -m fyb render scenes/hand-trace.fyb --under refs/hands-crop.jpg
+hand preset=pencil seed=77
+
+let 铅 = #3B342B
+let 淡 = #8A7F6E
+
+curve [342,972 312,864 276,756 246,660 204,612 156,564 102,516 54,480 30,522 48,576 102,624 168,672 228,708 264,660 300,576 318,516 324,408 336,288 348,192 354,126 378,102 402,132 408,216 414,312 420,408 432,432 444,336 456,228 468,138 480,78 510,60 534,96 540,192 540,300 534,384 552,420 576,336 600,252 630,180 654,132 684,120 702,168 696,252 684,336 672,408 684,456 720,396 756,348 792,324 816,324 840,360 828,420 792,480 756,516 768,576 780,672 756,780 720,888 684,972] w=8 stroke=$铅 closed tex=paper tex_scale=0.4 jitter=0.5 taper=0
+
+curve [336,636 420,696 516,732 600,720 660,696] w=7 stroke=$淡 tex=paper tex_scale=0.4 alpha=0.85 jitter=0.5 taper=0.5
+curve [384,816 480,876 576,888] w=7 stroke=$淡 tex=paper tex_scale=0.4 alpha=0.85 jitter=0.5 taper=0.5
+curve [264,624 348,660] w=7 stroke=$淡 tex=paper tex_scale=0.4 alpha=0.8 jitter=0.5 taper=0.5
+curve [354,126 384,138 420,168] w=5 stroke=$淡 tex=paper tex_scale=0.4 alpha=0.8 jitter=0.5 taper=0.5
+curve [480,78 510,90 540,120] w=5 stroke=$淡 tex=paper tex_scale=0.4 alpha=0.8 jitter=0.5 taper=0.5
+curve [654,132 678,156] w=5 stroke=$淡 tex=paper tex_scale=0.4 alpha=0.8 jitter=0.5 taper=0.5
+curve [816,324 822,372] w=5 stroke=$淡 tex=paper tex_scale=0.4 alpha=0.8 jitter=0.5 taper=0.5
+
+text 40,60 "手 · 临摹" 24 align=left color=$淡 hand=0.4

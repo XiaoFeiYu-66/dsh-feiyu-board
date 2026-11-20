@@ -1,0 +1,55 @@
+canvas 1920x1080
+bg #FDF1DF
+
+hand preset=child seed=31
+
+# 一坨影子，贴纸才有重量
+shadow ref=head dx=0 dy=18 alpha=0.12
+
+# 耳朵（先画，藏在头后面）
+poly [700,330 632,150 812,196] fill=#E9A968 stroke=#3A2A1E width=9
+poly [1220,330 1288,150 1108,196] fill=#E9A968 stroke=#3A2A1E width=9
+poly [708,272 678,191 759,212] fill=#F2A9A0
+poly [1212,272 1242,191 1161,212] fill=#F2A9A0
+# 头
+ellipse 960,470,300,262 fill=#F6C48B stroke=#3A2A1E width=9 name=head
+
+# 斑纹
+ink [900,250 930,330] w=9 color=#D98F52 taper=0.5 jitter=1.0
+ink [960,238 960,326] w=9 color=#D98F52 taper=0.5 jitter=1.0
+ink [1020,250 990,330] w=9 color=#D98F52 taper=0.5 jitter=1.0
+
+# 眼睛
+circle 862,470,30 fill=#1F2937
+circle 1058,470,30 fill=#1F2937
+circle 852,458,11 fill=#FFFFFF
+circle 1048,458,11 fill=#FFFFFF
+
+# 鼻子和嘴
+poly [920,540 1000,540 960,584] fill=#E08A72 stroke=#3A2A1E width=6
+ink [960,584 960,606] w=6 color=#3A2A1E taper=0
+ink [960,606 916,636] w=6 color=#3A2A1E taper=0.4
+ink [960,606 1004,636] w=6 color=#3A2A1E taper=0.4
+
+# 胡须
+ink [700,540 560,516] w=5 color=#3A2A1E taper=0.7 jitter=0.5
+ink [700,580 548,588] w=5 color=#3A2A1E taper=0.7 jitter=0.5
+ink [700,618 560,660] w=5 color=#3A2A1E taper=0.7 jitter=0.5
+ink [1220,540 1360,516] w=5 color=#3A2A1E taper=0.7 jitter=0.5
+ink [1220,580 1372,588] w=5 color=#3A2A1E taper=0.7 jitter=0.5
+ink [1220,618 1360,660] w=5 color=#3A2A1E taper=0.7 jitter=0.5
+
+# 腮红
+circle 790,566,44 fill=#F2795F alpha=0.28
+circle 1130,566,44 fill=#F2795F alpha=0.28
+
+# 前爪：两个椭圆，压在脸上
+ellipse 790,790,112,92 fill=#F6C48B stroke=#3A2A1E width=9
+ellipse 1130,790,112,92 fill=#F6C48B stroke=#3A2A1E width=9
+ink [760,806 760,846] w=5 color=#3A2A1E taper=0.4
+ink [800,808 800,848] w=5 color=#3A2A1E taper=0.4
+ink [1160,806 1160,846] w=5 color=#3A2A1E taper=0.4
+ink [1120,808 1120,848] w=5 color=#3A2A1E taper=0.4
+
+# 字
+text 960,986 "今天也不想上班" 58 align=center color=#3A2A1E hand=0.3
