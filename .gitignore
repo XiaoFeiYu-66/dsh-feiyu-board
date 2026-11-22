@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+build/
+dist/
+
+# 离线安装用的 wheel（PySide6 一个就 78MB，绝不进仓库）
+.wheels/
+
+# 本地调试脚本（硬编码本机路径，不公开）
+_dev/
+
+# 运行时产物（每个人自己生成，不进仓库）
+renders/
+.state/
+*.png
+*.apng
+!docs/img/*.png
+!samples/*.png
+
+# 参考图（私人素材，不公开）
+refs/
+
+# 测试跑出来的临时夹具（run_macro 每次重建）
+tests/_tmp_*
+
+# 打包/临时
+_pack/
+_pack-*/
+office-preview-*/
+.dsh-office-*/
+
+# 编辑器
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db

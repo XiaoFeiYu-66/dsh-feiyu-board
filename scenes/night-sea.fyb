@@ -1,0 +1,121 @@
+# 深海的夜（第十一版：让鲸更大，让灯照过去）
+canvas 1920x1080
+bg #04080E
+
+grad rect 0,0,1920,700 from=#0B1B33 to=#17385C dir=90
+
+circle 1452,236,104 fill=#FFFDF2
+blur 52
+  circle 1452,236,190 fill=#FFF6DE52
+endblur
+blur 18
+  circle 1452,232,84 fill=#FFFFF84A
+endblur
+
+circle 322,150,2.6 fill=#DCE9FF alpha=0.85
+circle 610,92,2 fill=#DCE9FF alpha=0.6
+circle 906,196,3 fill=#DCE9FF alpha=0.7
+circle 1178,120,2.2 fill=#DCE9FF alpha=0.55
+circle 1690,318,2.4 fill=#DCE9FF alpha=0.6
+circle 760,318,1.8 fill=#DCE9FF alpha=0.45
+circle 1044,244,1.6 fill=#DCE9FF alpha=0.4
+circle 1250,368,1.4 fill=#DCE9FF alpha=0.3
+
+blur 30
+  rect 0,612,1920,92 fill=#8FB6D82A
+endblur
+
+# ── 海 ──
+grad rect 0,656,1920,424 from=#0B2438 to=#030910 dir=90
+
+blur 26
+  blend screen
+    grad rect 1370,656,88,424 from=#F7F1DE55 to=#F7F1DE00 dir=90
+    grad rect 1470,656,60,340 from=#F7F1DE3B to=#F7F1DE00 dir=90
+    grad rect 1300,656,44,300 from=#F7F1DE26 to=#F7F1DE00 dir=90
+  endblend
+endblur
+
+ink [120,780 420,776 700,784] w=5 color=#5C8FBF alpha=0.2 taper=0.6
+ink [880,830 1180,824 1460,834] w=4 color=#5C8FBF alpha=0.16 taper=0.6
+
+# ── 鲸：整体放大一点，往右上挪 ──
+group scale=1.12 about=[600,560]
+  # 身体
+  poly [330,706 344,656 378,614 438,576 516,542 598,514 676,494 742,480 742,520 672,566 596,614 516,660 446,698] fill=#060D17 name=whale
+  # 尾鳍：两片叶，中间缺口
+  curve [742,480 796,444 826,374 842,414 862,440 806,480 742,520] closed fill=#060D17 name=fluke
+  # 明暗
+  grad ref=whale from=#5A8CBB22 to=#060D1700 p0=[680,500] p1=[400,700]
+  grad ref=fluke from=#4A7BA822 to=#060D1700 p0=[840,400] p1=[740,505]
+  # 胸鳍
+  curve [456,672 516,690 556,664 500,646] closed fill=#0A1520
+  # 颌线
+  ink [352,678 452,674 552,646 632,606] w=4 color=#21384E alpha=0.7 taper=0.5
+  # 眼与嘴
+  circle 388,642,5.5 fill=#DCE9FF alpha=0.6
+  ink [352,694 424,702 486,692] w=5 color=#0A1520 alpha=0.9 taper=0.3
+endgroup
+
+# 出水：被搅动的水自己发光（冷青），船灯只是对答
+blend screen
+  blur 40
+    ellipse 320,714,210,56 fill=#4FD8C43C
+  endblur
+  blur 18
+    ellipse 308,710,120,30 fill=#6FE7D355
+  endblur
+endblend
+# 鲸腹部吃到的冷光（只在溅水那一片，别整条染绿）
+grad ref=whale from=#7FE0FF33 to=#7FE0FF00 p0=[400,714] p1=[520,620]
+# 发亮的水珠
+blend screen
+  circle 296,696,4 fill=#9BF3E5 alpha=0.55
+  circle 282,678,3 fill=#9BF3E5 alpha=0.45
+  circle 302,660,2.4 fill=#9BF3E5 alpha=0.4
+  circle 288,644,2 fill=#9BF3E5 alpha=0.34
+  circle 270,662,1.8 fill=#9BF3E5 alpha=0.28
+  circle 310,632,1.6 fill=#9BF3E5 alpha=0.24
+endblend
+# 水里残留的两道余波（也是冷的）
+blend screen
+  ink [180,744 340,740 470,746] w=3 color=#5FE0D0 alpha=0.22 taper=0.7
+  ink [210,772 360,768 500,774] w=2.4 color=#5FE0D0 alpha=0.14 taper=0.7
+endblend
+
+# ── 船：挪近，灯光洒到鲸那边的水面 ──
+group at=[1046,800]
+  curve [-92,6 -64,-8 34,-10 84,0 70,28 -32,32] closed fill=#050B14
+  ink [-88,4 -60,-6 34,-8 80,-1] w=3 color=#8FB6D8 alpha=0.55 taper=0.7
+  circle -12,-26,11 fill=#050B14
+  ink [-22,-28 -14,-36] w=3 color=#8FB6D8 alpha=0.35 taper=0.8
+  curve [-22,-14 -14,-2 8,2 16,-8 4,-16 -12,-16] closed fill=#050B14
+  ink [8,-10 30,-46] w=4 color=#050B14 taper=0.35
+  blur 24
+    circle 34,-56,40 fill=#FFC27A44
+  endblur
+  blur 10
+    circle 34,-56,18 fill=#FFD79A66
+  endblur
+  circle 34,-56,8 fill=#FFE9C4
+endgroup
+
+# 灯光在水面铺开的一条暖带（把船和鲸连起来）
+blur 34
+  blend screen
+    grad rect 700,760,520,120 from=#FFC27A22 to=#FFC27A00 dir=0
+  endblend
+endblur
+
+# 船下的倒影
+ellipse 1082,846,54,12 fill=none stroke=none name=reflb
+blend screen
+  grad ref=reflb from=#FFC27A44 to=#FFC27A00
+endblend
+
+# ── 前景 ──
+ink [0,1010 320,1000 640,1014] w=9 color=#122A3E alpha=0.8 taper=0.5
+ink [700,1046 1080,1036 1420,1050] w=8 color=#122A3E alpha=0.7 taper=0.5
+ink [1180,980 1520,974 1850,986] w=5 color=#5C8FBF alpha=0.14 taper=0.6
+
+grad circle 960,560,1240 from=#00000000 to=#000000AA

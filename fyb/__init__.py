@@ -1,3 +1,7 @@
-"""小飞鱼画板（dsh-feiyu-board）。M0：只有笔和画布。"""
+"""小飞鱼画板（dsh-feiyu-board）。
 
-__version__ = "0.1.0-m0"
+版本号在这里是**唯一真源**：命令行 `fyb --version`、README、DSL.md 都对着它。
+文档漂移比 bug 难查，所以每次改行为都该动这个数。
+"""
+
+__version__ = "1.8.0"

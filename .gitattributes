@@ -1,0 +1,10 @@
+# 批处理必须 CRLF，否则 cmd.exe 会解析错（goto / 多行 if 尤其容易坏）
+*.cmd  text eol=crlf
+*.bat  text eol=crlf
+# 其余统一 LF
+*.py   text eol=lf
+*.md   text eol=lf
+*.fyb  text eol=lf
+*.js   text eol=lf
+*.json text eol=lf
+*.yml  text eol=lf

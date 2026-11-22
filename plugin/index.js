@@ -7,7 +7,7 @@
  *  3. 不碰任何宿主状态，出问题只影响这个插件的面板
  */
 import { spawn } from 'node:child_process'
-import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, openSync, readSync, closeSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { createReadStream } from 'node:fs'
 import { basename, dirname, extname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -63,6 +63,26 @@ function pythonLooksAvailable() {
   const isPath = PYTHON.includes('/') || PYTHON.includes('\\')
   return isPath ? existsSync(PYTHON) : true
 }
+
+/**
+ * 读 PNG 的像素尺寸：只读文件头 24 字节里的 IHDR，不引任何图像库。
+ * 工具返回里带上尺寸，消费方就不用为了知道多大而自己去开图。
+ */
+function pngSize(file) {
+  let fd
+  try {
+    fd = openSync(file, 'r')
+    const buf = Buffer.alloc(24)
+    readSync(fd, buf, 0, 24, 0)
+    if (buf.toString('ascii', 12, 16) !== 'IHDR') return null
+    return { width: buf.readUInt32BE(16), height: buf.readUInt32BE(20) }
+  } catch {
+    return null
+  } finally {
+    if (fd !== undefined) { try { closeSync(fd) } catch { /* 已关 */ } }
+  }
+}
+
 
 
 
@@ -231,7 +251,11 @@ export function apply(ctx) {
       type: 'object',
       properties: {
         scene: { type: 'string', description: '场景名（如 rain-window）或 .fyb 的绝对路径' },
-        scale: { type: 'integer', description: '超采样倍率，默认 2（输出 = 画布 × 倍率）' },
+        scale: {
+          type: 'integer',
+          description: '内部超采样倍率，默认 2。**输出尺寸恒等于画布尺寸**'
+            + '（倍率只影响抗锯齿质量，不会把图放大）',
+        },
         anim: { type: 'boolean', description: 'true = 顺便生成逐笔动画（APNG）' },
         out: { type: 'string', description: '输出文件名（放在 renders/ 下），默认同场景名' },
         under: { type: 'string', description: '临摹用：垫在最下面的参考图绝对路径' },
@@ -278,12 +302,18 @@ export function apply(ctx) {
 
       writeProgress({ running: false, scene, note: '完成', done: 1, total: 1, ms, png })
       const size = (statSync(png).size / 1024).toFixed(0)
+      // 把最终像素尺寸带回去：消费方不该为了知道多大而自己开图
+      const dims = pngSize(png)
+      const dimText = dims ? `${dims.width}×${dims.height}` : '尺寸未知'
       return {
         ok: true,
         png,
         anim: animPath,
         ms,
-        summary: `画好了：${png}（${size} KB，${ms} ms）${animPath ? `\n逐笔动画：${animPath}` : ''}`,
+        width: dims?.width,
+        height: dims?.height,
+        summary: `画好了：${png}（${dimText}，${size} KB，${ms} ms）`
+          + (animPath ? `\n逐笔动画：${animPath}` : ''),
       }
     },
   }), 'feiyu-board: fyb_draw')

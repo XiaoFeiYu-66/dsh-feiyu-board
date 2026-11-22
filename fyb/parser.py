@@ -36,7 +36,7 @@ VERBS: dict[str, Spec] = {
                              "wavelength", "step", "name", "tex", "tex_scale",
                              "tex_alpha", "passes", "spread", "cap")),
     "text":      Spec(4, 4, ("size", "color", "align", "font", "hand", "tracking",
-                             "name")),
+                             "alpha", "name")),
     "group":     Spec(0, 1, ("name", "at", "rot", "scale", "flip", "about",
                              "template", "alpha")),
     "endgroup":  Spec(0, 0, ()),
@@ -62,6 +62,32 @@ VERBS: dict[str, Spec] = {
 
 # 可以"裸写"的开关：`curve [...] closed` 等价于 `closed=1`
 FLAGS = {"closed"}
+
+# 属性别名：同一个概念在不同命令上名字不一样，写错就是 E011 一次往返。
+# 这里按每个命令自己的 Spec 自动推导别名，不手写 25 张表：
+#   线宽  w / width     —— 命令只认其中一个，另一个当别名
+#   描边色 stroke / color —— 同上（形状族用 stroke，笔族用 color）
+_ALIAS_CACHE: dict[tuple[str, ...], dict[str, str]] = {}
+
+
+def aliases_for(keys: tuple[str, ...]) -> dict[str, str]:
+    """这个命令接受哪些别名（别名 → 正式名）。"""
+    got = _ALIAS_CACHE.get(keys)
+    if got is not None:
+        return got
+    ks = set(keys)
+    got = {}
+    if "width" in ks and "w" not in ks:
+        got["w"] = "width"
+    elif "w" in ks and "width" not in ks:
+        got["width"] = "w"
+    if "stroke" in ks and "color" not in ks:
+        got["color"] = "stroke"
+    elif "color" in ks and "stroke" not in ks:
+        got["stroke"] = "color"
+    _ALIAS_CACHE[keys] = got
+    return got
+
 
 COLOR_RE = re.compile(r"^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$")
 NAME_RE = re.compile(r"^[A-Za-z_\u4e00-\u9fff][\w\u4e00-\u9fff\-]*$")
@@ -110,9 +136,14 @@ def parse_command(tokens: list[Token], line: int, raw: str) -> Command:
         if "=" in text and not text.startswith('"'):
             key, _, value = text.partition("=")
             key = key.strip().lower()
+            alias = aliases_for(spec.keys)
+            key = alias.get(key, key)
             if key not in spec.keys:
-                raise DslError("E011", f"{verb} 没有 {key!r} 这个属性"
-                                       f"（可用：{', '.join(spec.keys) or '无'}）",
+                names = ", ".join(spec.keys) or "无"
+                if alias:
+                    names += f"；别名：{', '.join(sorted(alias))}"
+                raise DslError("E011", f"{verb} 没有这个属性"
+                                       f"（可用：{names}）",
                                line, tok.col, len(key))
             if key in kw:
                 raise DslError("E015", f"属性 {key!r} 写了两次", line, tok.col, len(key))

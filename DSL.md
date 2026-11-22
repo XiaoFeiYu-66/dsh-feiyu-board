@@ -1,5 +1,8 @@
 # 小飞鱼画板 · DSL 速查
 
+> **版本 1.8.0**（2026-11-22）。改了行为看 `CHANGELOG.md`；
+> 如果这里的描述和你手上的包对不上，先比版本号——文档漂移比 bug 更难查。
+
 给任何要画一张的会话看：**先读完这一段，再动手**。
 工具：`fyb_doc`（要这份文档）、`fyb_scenes`（现有场景）、`fyb_draw`（渲染）。
 
@@ -105,6 +108,23 @@ let 孔色 = #0055FF          # 想改库里的值，场景里再写一行就行
 ---
 
 ## 3. 属性
+
+### 属性名对照表（先看这张，能少踩一类错）
+
+同一个概念在不同命令上名字不一样。**下面这些别名现在都认**，写哪个都行：
+
+| 概念 | 形状族（rect / circle / ellipse / curve / poly / bool） | 笔族（ink / hatch / hand） | 别名 |
+|---|---|---|---|
+| 描边色 | `stroke=` | `color=` | 两个都认 |
+| 线宽 | `width=` | `w=` | 两个都认 |
+| 不透明度 | `alpha=` | `alpha=` | 一致 |
+| 字体大小 | — | `text` 用 `size=` | — |
+
+```
+ellipse 520,820,280,180 stroke=#10102A w=6      # 形状族用 w= 也行
+ink [20,60 280,60] w=18 stroke=#222             # 笔族用 stroke= 也行
+```
+只有 `curve` / `poly` 两族都是（它们既画形状又用笔描边），所以四个名字全认。
 
 ### 形状（rect / circle / ellipse / curve / poly）
 `fill=` `stroke=` `width=` `alpha=` `name=`
@@ -293,7 +313,20 @@ $py = "…\dsh-feiyu-board\.venv\Scripts\python.exe"
 & $py -m fyb trace  refs\hands.jpg --mode skeleton --out scenes\hand.fyb
 & $py -m fyb trace  refs\room.jpg  --mode contour  --invert --out scenes\room.fyb
 & $py -m fyb posterize 参考图.png --out scenes\chibi.fyb --colors 28
+& $py -m fyb balance scenes\x.fyb --cells 4x3 --grid thirds
 ```
+
+### `render` 的 `--scale` 到底缩放什么
+
+**输出尺寸恒等于画布尺寸**。`--scale` 只影响超采样质量，不改文件大小：
+
+| 参数 | 渲染 | 落盘 |
+|---|---|---|
+| 默认 `--scale 2` | 2 倍超采样，再缩回 | 画布尺寸（1920 画布 → 1920） |
+| `--fast` | 不超采样，抗锯齿也关 | 画布尺寸（最快，草稿用） |
+| `--raw` | 2 倍超采样，**不缩回** | 画布 × 倍率（1920 → 3840） |
+
+想要更大的图，改 `canvas` 声明，别指望 `--scale`。
 
 ### `fyb trace`：参考图 → 点列
 

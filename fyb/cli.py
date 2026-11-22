@@ -9,6 +9,7 @@ from pathlib import Path
 
 from .compiler import compile_file
 from .errors import format_all
+from . import __version__
 
 EXIT_OK, EXIT_DSL, EXIT_RENDER = 0, 2, 3
 
@@ -67,8 +68,18 @@ def cmd_render(path: Path, out: Path, scale: int, fast: bool,
         dump_ir.write_text(json.dumps(res.scene.to_dict(), ensure_ascii=False,
                                       indent=1), encoding="utf-8")
     s = res.scene
-    print(f"{out}  {s.width}×{s.height}@{scale}x  图元 {len(s.prims)}  "
-          f"{dt:.0f} ms")
+    # 报**落盘尺寸**，不是倍率。以前打 "@2x" 会让人以为文件是两倍大。
+    # 三种情形不一样：--fast 根本不超采样；--raw 保留超采样；默认缩回画布尺寸。
+    if fast:
+        out_w, out_h = s.width, s.height
+        note = "（--fast：不超采样，抗锯齿也关）"
+    elif raw:
+        out_w, out_h = s.width * scale, s.height * scale
+        note = f"（--raw：保留 {scale}x 超采样）"
+    else:
+        out_w, out_h = s.width, s.height
+        note = f"（{scale}x 超采样 → 缩回画布尺寸）" if scale > 1 else ""
+    print(f"{out}  {out_w}×{out_h}{note}  图元 {len(s.prims)}  {dt:.0f} ms")
     return EXIT_OK
 
 
@@ -568,7 +579,7 @@ def main(argv=None) -> int:
     except Exception:                             # noqa: BLE001
         pass
     ap = argparse.ArgumentParser(prog="fyb", description="小飞鱼画板")
-    ap.add_argument("--version", action="version", version="fyb 0.1.0-m1")
+    ap.add_argument("--version", action="version", version=f"fyb {__version__}")
     sub = ap.add_subparsers(dest="cmd", required=True)
 
     c = sub.add_parser("check", help="只编译，不出图")
