@@ -52,6 +52,10 @@ class Prim:
     dx: float = 0.0
     dy: float = 0.0
     blur: float = 0.0
+    # 投影按轮廓外扩多少像素：>0 就是"贴着轮廓走"的阴影（不靠整体偏移）
+    spread: float = 0.0
+    # 真图层：同一 id 的图元先画进自己的缓冲，再整体合成一次（0 = 不在图层里）
+    layer_id: int = 0
     # 渐变（kind == "grad" 时有效）
     grad: dict = field(default_factory=dict)
     # 显式写了 fill=none stroke=none：只当几何用（给 clip / hatch 当靶子），不画
@@ -70,6 +74,9 @@ class Scene:
     groups: dict[str, list[int]] = field(default_factory=dict)
     # 组号 → 组的 alpha（只有 alpha<1 的组才在这里）
     group_alpha: dict[int, float] = field(default_factory=dict)
+    # 真图层：id → (alpha, blend)。层内的重叠只算一次，不会重复混合
+    layer_alpha: dict[int, float] = field(default_factory=dict)
+    layer_blend: dict[int, str] = field(default_factory=dict)
 
     def by_name(self, name: str):
         for p in self.prims:

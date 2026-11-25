@@ -273,7 +273,15 @@ def _paint_along(p: QPainter, prim: Prim, ctx, scale: float, base_seed: int,
     count = max(1, int(prim.grad.get("count", 5)))
     s = float(prim.grad.get("scale", 1.0))
     use_rot = bool(prim.grad.get("rot", 1))
+    spacing = float(prim.grad.get("spacing", 0) or 0)
+    jitter = float(prim.grad.get("jitter", 0) or 0)
     scene = ctx["scene"]
+
+    # 印章模式：给了 spacing 就按**长度**算间距（count 让位），
+    # 这样同一支"刷子"在长路径上不会拉稀、在短路径上不会挤成一坨。
+    total_len = float(refp.length()) if spacing > 0 else 0.0
+    if spacing > 0 and total_len > 0:
+        count = max(1, min(2000, int(round(total_len / spacing))))
 
     # use 复制出来的 along 带着一层变换（它自己没有几何可以改坐标）
     if prim.mate is not None:
@@ -281,13 +289,28 @@ def _paint_along(p: QPainter, prim: Prim, ctx, scale: float, base_seed: int,
         p.setTransform(QTransform(*prim.mate), True)
 
     for i in range(count):
-        t = (i + 0.5) / count
+        if spacing > 0 and total_len > 0:
+            # 按弧长定位（Qt 的 percent 是等弧长的，可以直接换算）
+            t = min(1.0, max(0.0, (i + 0.5) * spacing / total_len))
+        else:
+            t = (i + 0.5) / count
         pt = refp.pointAtPercent(t)
+        ang = -refp.angleAtPercent(t) if use_rot else 0.0
+        dx = dy = dang = 0.0
+        dscale = 1.0
+        if jitter > 0:
+            # 每枚一个独立种子：同一份场景永远得到同样的抖动
+            jr = Rng(seed_hash(base_seed, f"stamp{prim.line}#{i}"))
+            amp = max(3.0, min(spacing if spacing > 0 else 24.0, 40.0)) * jitter
+            dx = (jr.next() * 2 - 1) * amp
+            dy = (jr.next() * 2 - 1) * amp
+            dang = (jr.next() * 2 - 1) * jitter * 20.0
+            dscale = 1.0 + (jr.next() * 2 - 1) * jitter * 0.35
         p.save()
-        p.translate(pt)
+        p.translate(QPointF(pt.x() + dx, pt.y() + dy))
         if use_rot:
-            p.rotate(-refp.angleAtPercent(t))
-        p.scale(s, s)
+            p.rotate(ang + dang)
+        p.scale(s * dscale, s * dscale)
         for j in idxs:
             child = scene.prims[j]
             if child.kind == "shadow":
@@ -524,18 +547,31 @@ def _paint_shadow(p: QPainter, prim: Prim, ctx, scale: float):
         return
     moved = QPainterPath(path)
     moved.translate(prim.dx, prim.dy)
+    # spread：把轮廓往外"长"出去 —— 用粗笔把同一路径描一遍（笔宽 = 2×spread），
+    # 再填内部。外沿正好扩出 spread，宽窄跟着轮廓走，圆角/转折处不会断。
+    spread = float(getattr(prim, "spread", 0.0) or 0.0)
+
+    def _draw_shape(painter, color: str, alpha: float):
+        painter.setBrush(to_qcolor(color, alpha))
+        if spread > 0:
+            pen = QPen(to_qcolor(color, alpha))
+            pen.setWidthF(spread * 2.0)
+            pen.setJoinStyle(Qt.RoundJoin)
+            pen.setCapStyle(Qt.RoundCap)
+            painter.setPen(pen)
+        else:
+            painter.setPen(Qt.NoPen)
+        painter.drawPath(moved)
 
     if prim.blur < 0.5:
         p.save()
-        p.setPen(Qt.NoPen)
-        p.setBrush(to_qcolor(prim.fill or "#000000", prim.alpha))
-        p.drawPath(moved)
+        _draw_shape(p, prim.fill or "#000000", prim.alpha)
         p.restore()
         return
 
     # 软阴影：把轮廓画到一张小图上 → 模糊 → 合成。
     # 只开 bbox+3σ 那么大，不占整张画布。
-    pad = prim.blur * 3
+    pad = prim.blur * 3 + spread
     box = moved.boundingRect().adjusted(-pad, -pad, pad, pad)
     w = max(1, int(round(box.width() * scale)))
     h = max(1, int(round(box.height() * scale)))
@@ -545,9 +581,7 @@ def _paint_shadow(p: QPainter, prim: Prim, ctx, scale: float):
     lp.setRenderHint(QPainter.Antialiasing, True)
     lp.scale(scale, scale)
     lp.translate(-box.x(), -box.y())
-    lp.setPen(Qt.NoPen)
-    lp.setBrush(to_qcolor(prim.fill or "#000000", 1.0))
-    lp.drawPath(moved)
+    _draw_shape(lp, prim.fill or "#000000", 1.0)
     lp.end()
 
     soft = blur_image(layer, prim.blur * scale)
@@ -596,13 +630,14 @@ def _unit_draw(p: QPainter, unit: list[Prim], cv, ctx, base: int,
 
 
 def _split_units(prims: list[Prim], limit: int | None) -> list[list[Prim]]:
-    """把图元切成"直接画"和"整块模糊"两类。同一 blur_id 的连续段算一个单元。
+    """把图元切成"直接画"和"要单独一层"两类。
 
-    组层边界也必须切开：一个单元只能属于一条组链，否则合成时会用错层。
+    同一个 blur_id 或 layer_id 的相邻图元归进同一个单元；组链变了也要断开
+    （组透明按组合成，不能跨组混）。
     """
     units: list[list[Prim]] = []
     cur: list[Prim] = []
-    cur_id = 0
+    cur_key: tuple[int, int] = (0, 0)
     cur_groups: tuple[int, ...] = ()
     count = 0
     for prim in prims:
@@ -610,23 +645,24 @@ def _split_units(prims: list[Prim], limit: int | None) -> list[list[Prim]]:
             break
         if prim.invisible:
             continue
-        if prim.blur_id == 0 or prim.groups != cur_groups:
+        key = (prim.blur_id, prim.layer_id)
+        if key == (0, 0) or prim.groups != cur_groups:
             if cur:
                 units.append(cur)
                 cur = []
+            cur_key = key
             cur_groups = prim.groups
-            if prim.blur_id == 0:
+            if key == (0, 0):
                 units.append([prim])
                 count += 1
                 continue
-            cur_id = prim.blur_id
             cur.append(prim)
             count += 1
             continue
-        if cur and cur_id != prim.blur_id:
+        if cur and cur_key != key:
             units.append(cur)
             cur = []
-        cur_id = prim.blur_id
+        cur_key = key
         cur.append(prim)
         count += 1
     if cur:
@@ -783,8 +819,47 @@ def render(scene: Scene, scale: int = 2, fast: bool = False, seed: int | None = 
         if state.get("painter") is not tp:
             state = {"clip": (), "blend": "normal", "painter": tp}
 
-        if len(unit) == 1 and unit[0].blur_id == 0:
+        if len(unit) == 1 and unit[0].blur_id == 0 and unit[0].layer_id == 0:
             _unit_draw(tp, unit, cv, ctx, base, state, cv.scale)
+            continue
+
+        # ── 真图层：先把这层的图元画进**自己的**缓冲，再整体合成一次 ──
+        # 关键在于层内用 normal 叠加，所以层里的笔互相重叠只算一次，
+        # 不会像块级 blend 那样在交点处重复混合。
+        lid = unit[0].layer_id
+        if lid != 0:
+            box = QRectF()
+            for prim in unit:
+                r = _prim_bounds(prim, ctx)
+                if r is None:
+                    box = empty
+                    break
+                box = r if box.isNull() else box.united(r)
+            if box.isNull() or box.isEmpty():
+                continue
+            box = box.adjusted(-2, -2, 2, 2).intersected(empty)
+            if box.width() < 2 or box.height() < 2:
+                continue
+            lw = max(1, int(round(box.width() * cv.scale)))
+            lh = max(1, int(round(box.height() * cv.scale)))
+            limg = QImage(lw, lh, QImage.Format_ARGB32_Premultiplied)
+            limg.fill(0)
+            lpainter = QPainter(limg)
+            lpainter.setRenderHint(QPainter.Antialiasing, not fast)
+            lpainter.scale(cv.scale, cv.scale)
+            lpainter.translate(-box.x(), -box.y())
+            _unit_draw(lpainter, unit, cv, ctx, base,
+                       {"clip": (), "blend": "normal"}, cv.scale)
+            lpainter.end()
+            alpha = float((getattr(scene, "layer_alpha", {}) or {}).get(lid, 1.0))
+            mode = (getattr(scene, "layer_blend", {}) or {}).get(lid, "normal")
+            tp.save()
+            tp.setOpacity(alpha)
+            if mode != "normal":
+                tp.setCompositionMode(_BLEND_QT.get(
+                    mode, QPainter.CompositionMode_SourceOver))
+            tp.drawImage(box, limg)
+            tp.restore()
             continue
 
         # 整块模糊：只开"这一块图元"那么大的层，不占整张画布。

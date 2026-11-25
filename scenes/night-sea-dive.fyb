@@ -1,0 +1,94 @@
+﻿# 深海的夜 · 下潜（只有尾鳍和尾柄露在水上）
+canvas 1920x1080
+bg #04080E
+
+grad rect 0,0,1920,700 from=#0B1B33 to=#17385C dir=90
+
+circle 960,188,96 fill=#FFFDF2
+blur 54
+  circle 960,188,182 fill=#FFF6DE4D
+endblur
+blur 20
+  circle 960,184,78 fill=#FFFFF84A
+endblur
+
+circle 300,150,2.6 fill=#DCE9FF alpha=0.8
+circle 560,88,2 fill=#DCE9FF alpha=0.55
+circle 700,250,2.4 fill=#DCE9FF alpha=0.5
+circle 1240,120,2.2 fill=#DCE9FF alpha=0.55
+circle 1520,262,2.6 fill=#DCE9FF alpha=0.6
+circle 1700,150,1.8 fill=#DCE9FF alpha=0.4
+circle 400,320,1.8 fill=#DCE9FF alpha=0.4
+circle 1380,340,1.6 fill=#DCE9FF alpha=0.35
+
+blur 30
+  rect 0,612,1920,92 fill=#8FB6D82A
+endblur
+
+# 海
+grad rect 0,662,1920,418 from=#0B2438 to=#030910 dir=90
+
+blur 26
+  blend screen
+    grad rect 920,662,86,418 from=#F7F1DE55 to=#F7F1DE00 dir=90
+    grad rect 1010,662,58,340 from=#F7F1DE3B to=#F7F1DE00 dir=90
+    grad rect 860,662,44,300 from=#F7F1DE26 to=#F7F1DE00 dir=90
+  endblend
+endblur
+
+# ── 鲸：尾柄从水里升起来，尾鳍横在上面 ──
+# 尾柄（一截粗的，下面没入水中）
+poly [676,520 800,548 892,704 812,712 700,610] fill=#060D17
+# 尾鳍：一整片宽叶，前缘平、后缘有缺口
+curve [398,502 470,452 600,436 726,466 828,516 780,554 706,538 636,562 490,540 402,516] closed fill=#060D17 name=fluke
+# 叶面受光的那一小块（月亮在上）
+curve [446,486 540,458 640,458 730,492 640,478 520,492] closed fill=#24384E alpha=0.35
+# 叶缘挂着的水
+ink [438,548 436,586] w=2.6 color=#9FC4E6 alpha=0.2 taper=0.7
+ink [516,556 514,588] w=2.2 color=#9FC4E6 alpha=0.15 taper=0.7
+ink [600,546 600,578] w=2 color=#9FC4E6 alpha=0.13 taper=0.7
+
+# 尾柄入水处的环
+blur 16
+  ellipse 690,660,120,22 fill=#BFDCF23A
+endblur
+ink [576,668 690,672 800,666] w=3 color=#CFE4F8 alpha=0.3 taper=0.7
+circle 646,676,3.4 fill=#E8F2FF alpha=0.3
+circle 742,678,3 fill=#E8F2FF alpha=0.26
+circle 700,688,2.4 fill=#E8F2FF alpha=0.22
+
+# 水下的身子：只给一个模糊的暗影，读作"还在下面"
+blur 30
+  ellipse 640,800,260,120 fill=#03080E alpha=0.55
+endblur
+
+# ── 船 ──
+group at=[1420,798] scale=1.15
+  curve [-92,6 -64,-8 34,-10 84,0 70,28 -32,32] closed fill=#050B14
+  ink [-88,4 -60,-6 34,-8 80,-1] w=3 color=#8FB6D8 alpha=0.5 taper=0.7
+  circle -12,-26,11 fill=#050B14
+  ink [-22,-28 -14,-36] w=3 color=#8FB6D8 alpha=0.32 taper=0.8
+  curve [-22,-14 -14,-2 8,2 16,-8 4,-16 -12,-16] closed fill=#050B14
+  ink [8,-10 30,-46] w=4 color=#050B14 taper=0.35
+  blur 24
+    circle 34,-56,38 fill=#FFC27A3D
+  endblur
+  blur 10
+    circle 34,-56,16 fill=#FFD79A55
+  endblur
+  circle 34,-56,7 fill=#FFE9C4
+endgroup
+
+ellipse 1454,846,52,12 fill=none stroke=none name=reflb
+blend screen
+  grad ref=reflb from=#FFC27A44 to=#FFC27A00
+endblend
+
+# 前景
+ink [0,1010 320,1000 640,1014] w=9 color=#122A3E alpha=0.8 taper=0.5
+ink [700,1046 1080,1036 1420,1050] w=8 color=#122A3E alpha=0.7 taper=0.5
+ink [1180,980 1520,974 1850,986] w=5 color=#5C8FBF alpha=0.12 taper=0.6
+
+grad circle 960,520,1260 from=#00000000 to=#000000AA
+
+

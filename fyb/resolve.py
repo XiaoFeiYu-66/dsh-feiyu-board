@@ -83,6 +83,10 @@ def build(commands: list[P.Command], source_lines: list[tuple[int, str]]) -> Sce
     reported_missing_canvas = False
     clip_stack: list[str] = []
     blend_stack: list[str] = []
+    # 真图层栈：每个元素 (layer_id, alpha, blend)。层内图元打 layer_id，
+    # 渲染时先画进自己的缓冲再整体合成 —— 重叠只算一次。
+    layer_stack: list[tuple[int, float, str]] = []
+    layer_seq = 0
     blur_stack: list[tuple[int, float, float]] = []
     blur_seq = 0
     # 组透明：alpha_stack 记当前套在哪些"带 alpha 的组"里，group_depth 记每层
@@ -106,6 +110,8 @@ def build(commands: list[P.Command], source_lines: list[tuple[int, str]]) -> Sce
                 refs.append((name, cmd, "clip"))
         if blend_stack:
             p.blend = blend_stack[-1]
+        if layer_stack:
+            p.layer_id = layer_stack[-1][0]
         if blur_stack:
             bid, bradius, balpha = blur_stack[-1]
             p.blur_id = bid
@@ -223,6 +229,32 @@ def build(commands: list[P.Command], source_lines: list[tuple[int, str]]) -> Sce
             clip_stack.pop()
             continue
 
+        if verb == "layer" and ("alpha" in kw or "blend" in kw or not pos):
+            # 真图层块：layer alpha=0.6 blend=multiply ... endlayer
+            # 注意：layer 5（只有一个位置参数、没关键字）是老的 z 序写法，走下面那条路
+            layer_seq += 1
+            lid = layer_seq
+            a = P.as_range(
+                P.as_float(kw.get("alpha", "1"), "layer alpha",
+                           cmd.line, cmd.col),
+                0, 1, "layer alpha", cmd.line, cmd.col)
+            mode = kw.get("blend", "normal").strip().lower()
+            if mode not in BLEND_MODES:
+                err("E012", f"layer 不认识混合模式 {mode!r}；可用："
+                           f"{', '.join(BLEND_MODES)}", cmd)
+                continue
+            scene.layer_alpha[lid] = a
+            scene.layer_blend[lid] = mode
+            layer_stack.append((lid, a, mode))
+            continue
+
+        if verb == "endlayer":
+            if not layer_stack:
+                err("E006", "endlayer 多了（前面没有 layer）", cmd)
+                continue
+            layer_stack.pop()
+            continue
+
         if verb == "blend":
             mode = pos[0].strip().lower()
             if mode not in BLEND_MODES:
@@ -256,6 +288,11 @@ def build(commands: list[P.Command], source_lines: list[tuple[int, str]]) -> Sce
             sp.blur = P.as_range(
                 P.as_float(kw.get("blur", "0"), "shadow blur", cmd.line, cmd.col),
                 0, 300, "shadow blur", cmd.line, cmd.col)
+            # spread：按轮廓外扩，做出"贴着轮廓走"的阴影（不靠整体偏移）
+            sp.spread = P.as_range(
+                P.as_float(kw.get("spread", "0"), "shadow spread",
+                           cmd.line, cmd.col),
+                0, 300, "shadow spread", cmd.line, cmd.col)
             refs.append((ref, cmd, "shadow"))
             _tag(sp)
             scene.prims.append(sp)
@@ -370,6 +407,16 @@ def build(commands: list[P.Command], source_lines: list[tuple[int, str]]) -> Sce
                     P.as_float(kw.get("scale", "1"), "along scale", cmd.line, cmd.col),
                     0.01, 100, "along scale", cmd.line, cmd.col),
                 "rot": 1 if P.as_bool(kw.get("rot", "1")) else 0,
+                # 印章笔刷：spacing 按长度定间距（给了它就忽略 count），
+                # jitter 让每一枚有随机偏移/旋转/缩放 —— 不然看着是点阵不是刷子
+                "spacing": P.as_range(
+                    P.as_float(kw.get("spacing", "0"), "along spacing",
+                               cmd.line, cmd.col),
+                    0, 2000, "along spacing", cmd.line, cmd.col),
+                "jitter": P.as_range(
+                    P.as_float(kw.get("jitter", "0"), "along jitter",
+                               cmd.line, cmd.col),
+                    0, 1, "along jitter", cmd.line, cmd.col),
             }
             ap.alpha = P.as_range(
                 P.as_float(kw.get("alpha", "1"), "along alpha", cmd.line, cmd.col),
@@ -694,6 +741,8 @@ def build(commands: list[P.Command], source_lines: list[tuple[int, str]]) -> Sce
         errors.append(DslError("E006", f"blend {blend_stack[-1]!r} 没有 endblend", 1, 1))
     if blur_stack:
         errors.append(DslError("E006", f"blur 第 {blur_stack[-1][0]} 个没有 endblur", 1, 1))
+    if layer_stack:
+        errors.append(DslError("E006", "layer 块没有 endlayer", 1, 1))
     # 引用检查放在最后：允许"先用后定义"，但定义必须存在
     known = set(names) | set(scene.groups)
     for ref, cmd, what in refs:

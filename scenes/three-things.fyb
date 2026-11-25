@@ -1,0 +1,44 @@
+canvas 960x640
+bg #F6F1E7
+hand preset=clean seed=21
+
+# 「笔的三件事」——这一版新加的三个能力放在同一张里：
+#   ① 印章笔刷（along spacing + jitter）
+#   ② 贴着轮廓走的阴影（shadow spread）
+#   ③ 真图层（layer blend，内部不重复叠加）
+
+let 墨 = #3B342B
+let 土 = #C9A227
+
+# ── 标题 ────────────────────────────────────────────
+text 70,76 "三件小事" 40 align=left color=$墨 hand=0.25
+text 70,112 "印章笔刷 · 贴轮廓阴影 · 真图层" 19 align=left color=#8B7E6B
+curve [70,132 890,132] w=2 stroke=#CBBFA8 alpha=0.9 jitter=0.3
+
+# ── ① 印章笔刷：一支干刷，从左下扫到右上 ────────────
+group name=干刷 template=1
+  ink [0,0 0.4,0] w=17 color=$墨 alpha=0.40 tex=dry tex_scale=0.9
+  ink [0,0 0.4,0] w=9 color=$墨 alpha=0.55
+endgroup
+
+curve [90,250 280,205 470,250 660,200 840,240] fill=none stroke=none name=刷路
+along ref=刷路 group=干刷 spacing=7 jitter=0.35
+
+text 70,300 "① 印章笔刷：spacing 按长度定间距，jitter 让它散开" 16 align=left color=#8B7E6B
+
+# ── ② 贴着轮廓走的阴影 ─────────────────────────────
+# 阴影写在形状**前面**，否则会盖在形状上
+shadow ref=果 dx=0 dy=0 spread=12 blur=9 alpha=0.45 color=#4A3A22
+curve [420,470 500,400 620,392 700,450 690,540 590,586 470,560] \
+      fill=#E0B84A stroke=#3B342B width=3 closed name=果
+
+text 70,610 "② 贴轮廓阴影：外沿均匀、跟着转折走（spread=12）" 16 align=left color=#8B7E6B
+
+# ── ③ 真图层：一簇叠加的笔，整体压暗一次 ───────────
+layer alpha=1 blend=multiply
+  ink [720,395 900,455] w=40 color=#8C4B2A alpha=0.75 tex=dry
+  ink [720,455 900,515] w=40 color=#8C4B2A alpha=0.75 tex=dry
+  ink [730,520 890,470] w=36 color=#8C4B2A alpha=0.75 tex=dry
+endlayer
+
+text 640,610 "③ 真图层：三笔叠在一起，只乘一次" 16 align=left color=#8B7E6B

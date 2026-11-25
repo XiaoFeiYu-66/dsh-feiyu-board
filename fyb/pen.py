@@ -202,12 +202,20 @@ def apply_overshoot(points, overshoot, *, pin_start=False, pin_end=False):
     pts = [list(p) for p in points]
     first, second = pts[0], pts[1]
     last, prev = pts[-1], pts[-2]
-    d0 = math.hypot(first[0] - second[0], first[1] - second[1]) or 1.0
-    d1 = math.hypot(last[0] - prev[0], last[1] - prev[1]) or 1.0
-    first[0] += (first[0] - second[0]) / d0 * overshoot
-    first[1] += (first[1] - second[1]) / d0 * overshoot
-    last[0] += (last[0] - prev[0]) / d1 * overshoot
-    last[1] += (last[1] - prev[1]) / d1 * overshoot
+    d0 = math.hypot(first[0] - second[0], first[1] - second[1])
+    d1 = math.hypot(last[0] - prev[0], last[1] - prev[1])
+
+    # 位移先算完再统一应用。
+    # 两点笔画时 first 和 prev 是**同一个 list**，边算边改会让终点读到已经挪过
+    # 的起点 —— 实测把一个 0.1px 的笔尖甩成了 72px 的长条。
+    fdx = (first[0] - second[0]) / d0 * overshoot if d0 > 1e-9 else 0.0
+    fdy = (first[1] - second[1]) / d0 * overshoot if d0 > 1e-9 else 0.0
+    ldx = (last[0] - prev[0]) / d1 * overshoot if d1 > 1e-9 else 0.0
+    ldy = (last[1] - prev[1]) / d1 * overshoot if d1 > 1e-9 else 0.0
+    first[0] += fdx
+    first[1] += fdy
+    last[0] += ldx
+    last[1] += ldy
     return [(p[0], p[1]) for p in pts]
 
 

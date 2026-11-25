@@ -1,6 +1,6 @@
 # 小飞鱼画板 · DSL 速查
 
-> **版本 1.8.0**（2026-11-22）。改了行为看 `CHANGELOG.md`；
+> **版本 1.9.0**（2026-11-25）。改了行为看 `CHANGELOG.md`；
 > 如果这里的描述和你手上的包对不上，先比版本号——文档漂移比 bug 更难查。
 
 给任何要画一张的会话看：**先读完这一段，再动手**。
@@ -49,10 +49,10 @@ text 120,140 "夜里的海" 44 align=left color=#E8F4FF hand=0.3
 | `blur` / `endblur` | `blur 12` … `endblur` | 块内整体模糊（见 §4） |
 | `hatch` | `hatch ref=gshadow angle=-12 spacing=15 w=3` | 在引用形状里排平行线（每条是笔画） |
 | `bool` | `bool op=subtract base=body with=hole fill=#2B4A80` | op = subtract / union / intersect |
-| `along` | `along ref=hairline group=frill count=7` | 沿路径等距复制一组 |
+| `along` | `along ref=hairline group=frill spacing=18 jitter=0.4` | 沿路径复制一组；`spacing=` 按长度定间距、`jitter=` 每枚随机（印章笔刷，见 §3.5） |
 | `use` | `use fish at=[120,60] scale=0.5` | 按额外变换复用一组 |
 | `grad` | `grad rect 0,0,1920,1012 from=#131C23 to=#0A0F14 dir=90` | 线性（dir=角度）或 `grad circle cx,cy,r`（中心→边缘） |
-| `layer` | `layer 30` | 之后图元的起始 z |
+| `layer` / `endlayer` | `layer alpha=0.6 blend=multiply` … `endlayer` | **真图层**：层内先叠、最后整体合成一次（见 §4）；`layer 30` 是老的 z 序写法 |
 | `hand` | `hand preset=ink jitter=1.2 seed=17` | 全局手感与随机种子 |
 | `let` / `include` / `def` | `let 主色 = #C0392B` / `include "lib/parts.fyb"` / `def 孔 (x,y,r)` … `enddef` | 变量、跨文件复用、宏（见 §2） |
 | `blend` / `endblend` | `blend multiply` … `endblend` | 混合模式（见 §4） |
@@ -205,6 +205,34 @@ endgroup                          # 重叠处是均匀的 50%，不是 75%
 `hand preset=clean|ink|pencil|brush|child|messy`
 单笔属性永远优先于 preset。
 
+### 印章笔刷（along + spacing / jitter）
+
+沿一条路径反复"盖章"，就得到笔刷的效果。笔尖就是模板组里的东西。
+
+```
+group name=笔尖 template=1
+  ellipse 0,0,9,9 fill=#3B342B alpha=0.55
+  ellipse -4,-4,6,6 fill=#3B342B alpha=0.25    # 再叠一层，边缘有点颗粒
+endgroup
+
+curve [80,300 380,260 640,320 900,290] fill=none stroke=none name=路
+along ref=路 group=笔尖 spacing=16 jitter=0.45
+```
+
+| 属性 | 范围 | 默认 | 含义 |
+|---|---|---|---|
+| `spacing=` | 0–2000 | 0 | **按长度**的间距（px）。给了它就忽略 `count`，长路径自动多、短路径自动少 |
+| `jitter=` | 0–1 | 0 | 每一枚的随机偏移 + 旋转 ±20° + 缩放 ±35% |
+| `count=` | 1–500 | 5 | 不给 spacing 时用：沿路径均分这么多个 |
+| `rot=` | 0/1 | 1 | 让每枚跟着路径切线转（印章笔尖通常设 0） |
+| `scale=` | 0.01–100 | 1 | 整体缩放 |
+
+**什么时候用**：想画"有颗粒的笔触"（粉笔、干刷、喷点）、缝线、铆钉、脚印、草叶。
+
+- 笔尖里放 `ink … tex=dry` 就是干刷印章；放 `ellipse` 就是圆头笔。
+- `spacing` 小于笔尖直径时会自然重叠，笔触就连成一条 —— 这也是做"毛笔"的办法。
+- 抖动用的是散列种子，同一份场景两次渲染完全一致。
+
 ---
 
 ## 4. 混合模式与模糊
@@ -226,6 +254,31 @@ endblend
 
 ⚠️ 混合模式是跟"**下面已经画过的东西**"混合，所以顺序很重要：先铺底，再 `blend`。
 ⚠️ 底色是透明的地方，multiply 等于没画。
+⚠️ **块级 blend 是逐图元合成的**：同一块里两笔在交点重叠，就会乘两次、交点发黑。
+要"整层只乘一次"，用下面的真图层。
+
+### 真图层（layer … endlayer）
+
+```
+layer alpha=0.6 blend=multiply
+  ink [...] w=30 color=#8899AA      # 层内这两笔先按 normal 叠在一起
+  ink [...] w=30 color=#8899AA      # 交点不会加深，因为最后只合成一次
+endlayer
+```
+
+| 属性 | 范围 | 默认 | 含义 |
+|---|---|---|---|
+| `alpha=` | 0–1 | 1 | 整层不透明度（层内怎么重叠都只算一次） |
+| `blend=` | 同 blend 那 12 种 | normal | 整层跟下面合成时用的模式 |
+| `name=` | 文字 | — | 只作标记 |
+
+**什么时候该用**：
+- 一簇笔触想整体半透明（阴影、雾气、发丝束）→ `layer alpha=`
+- 一簇笔触想整体压暗/提亮，但**内部不许重复叠加** → `layer blend=multiply`
+- 只想让单独一笔半透明 → 直接给那个图元 `alpha=`，别开层
+
+⚠️ `layer 5`（只有一个数字、没有关键字）是**老的层序写法**，仍然可用；两者不冲突。
+⚠️ 图层会额外开一张离屏图（按这一层的包围盒），别在循环里开几百个。
 
 ### 模糊
 
@@ -237,6 +290,15 @@ endblur
 ```
 
 - `shadow` 加 `blur=` 就是软阴影；半径 0 是原来的硬边。
+- **`shadow spread=` 是"贴着轮廓走"的阴影**：按轮廓往外长 N 像素，宽窄跟着形状走，
+  圆角转折也不会断。`dx/dy` 是整体平移（右下厚左上薄），`spread` 是均匀外扩：
+
+```
+shadow ref=圆 dx=0 dy=0 spread=14 blur=10 alpha=0.55   # 贴轮廓
+shadow ref=圆 dx=16 dy=18 blur=10 alpha=0.55           # 整体偏移
+```
+
+  ⚠️ 两个都别忘了：`spread` 也能和 `dx/dy` 一起用（先外扩再偏移）。
 - `blur <半径>` 到 `endblur`：块里所有东西先画到一层，整层模糊后合成。适合光晕、雾、景深。
 - 半径上限 300（画布逻辑像素），内部按 2 倍超采样算，所以视觉上更柔。
 - 大半径会自动降采样再模糊（模糊本来就是低频），4K 上 r=24 大约 1 秒。
