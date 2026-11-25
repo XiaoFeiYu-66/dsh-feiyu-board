@@ -1,0 +1,111 @@
+canvas 1200x920
+bg #F3ECDD
+hand preset=clean seed=31
+
+# 蛾：用 v1.9 的三件新东西画的
+#   ① 印章笔刷撒粉  ② spread 贴轮廓影  ③ 真图层压暗翅根
+#   ① 印章笔刷：翅缘的粉、身上的绒毛
+#   ② spread 阴影：贴在纸上的接触影
+#   ③ 真图层：翅面的重色整体乘一次 + 两点轴渐变
+
+let 暗 = #2E2820
+let 灰浅 = #7A6E5C
+let 粉c = #3A3226
+
+# ── 影子：直接贴着两只前翅的轮廓（ref 指向后面才定义的形状也行）──
+# 一层散的当环境影，一层紧的当接触影
+shadow ref=翅左 dx=0 dy=14 spread=16 blur=34 alpha=0.16 color=#3A2E1C
+shadow ref=翅右 dx=0 dy=14 spread=16 blur=34 alpha=0.16 color=#3A2E1C
+shadow ref=翅左 dx=0 dy=5 spread=6 blur=8 alpha=0.14 color=#2A2114
+shadow ref=翅右 dx=0 dy=5 spread=6 blur=8 alpha=0.14 color=#2A2114
+
+# ── 粉的笔尖 ───────────────────────────────────────
+group name=粉 template=1
+  ink [0,0 0.6,0] w=11 color=$粉c alpha=0.32 tex=dry tex_scale=1.4
+  ink [0,0 0.6,0] w=5 color=$粉c alpha=0.26 tex=grain tex_scale=1.8
+endgroup
+
+# ── 后翅：缩小、往前提，藏在前翅底下 ────────────────
+curve [600,470 668,466 726,500 716,558 654,596 600,586] \
+      fill=#6E5F48 stroke=$暗 width=2.4 closed
+curve [600,470 532,466 474,500 484,558 546,596 600,586] \
+      fill=#6E5F48 stroke=$暗 width=2.4 closed
+
+# ── 前翅：前缘平、后缘锯齿 ─────────────────────────
+curve [600,395 700,340 810,305 900,298 950,330 965,380 \
+       940,415 900,435 880,470 845,450 815,485 780,462 \
+       745,495 710,468 675,495 640,470 610,490 600,500] \
+      fill=#A89272 stroke=$暗 width=2.6 closed name=翅左
+
+curve [600,395 500,340 390,305 300,298 250,330 235,380 \
+       260,415 300,435 320,470 355,450 385,485 420,462 \
+       455,495 490,468 525,495 560,470 590,490 600,500] \
+      fill=#A89272 stroke=$暗 width=2.6 closed name=翅右
+
+# ── 翅面渐变：根部亮、外缘暗（两点轴）───────────────
+grad ref=翅左 from=#C4AC84 to=#7E6A4C p0=[620,470] p1=[950,330]
+grad ref=翅右 from=#C4AC84 to=#7E6A4C p0=[580,470] p1=[250,330]
+
+# ── 翅根的重色：一个图层乘一次，交界不会发黑 ─────────
+layer alpha=0.9 blend=multiply
+  curve [600,400 640,430 660,480 640,520 600,530 560,520 540,480 560,430] \
+        fill=#8C6A44 stroke=none closed
+endlayer
+
+# ── 眼斑 ───────────────────────────────────────────
+ellipse 800,392,30,30 fill=#241F19
+ellipse 800,392,19,19 fill=#C9A46A
+ellipse 800,392,8,8 fill=#241F19
+ellipse 400,392,30,30 fill=#241F19
+ellipse 400,392,19,19 fill=#C9A46A
+ellipse 400,392,8,8 fill=#241F19
+
+# ── 翅脉 ───────────────────────────────────────────
+curve [610,420 700,392 800,370 880,368] w=1.7 stroke=$灰浅 alpha=0.5 taper=0.35
+curve [610,450 700,448 790,452 860,470] w=1.7 stroke=$灰浅 alpha=0.45 taper=0.35
+curve [590,420 500,392 400,370 320,368] w=1.7 stroke=$灰浅 alpha=0.5 taper=0.35
+curve [590,450 500,448 410,452 340,470] w=1.7 stroke=$灰浅 alpha=0.45 taper=0.35
+
+# ── 撒粉：沿前缘、外缘、后缘各扫一遍 ────────────────
+curve [600,395 700,340 810,305 900,298 950,330 965,380] \
+      fill=none stroke=none name=缘左
+along ref=缘左 group=粉 spacing=8 jitter=0.55
+
+curve [600,395 500,340 390,305 300,298 250,330 235,380] \
+      fill=none stroke=none name=缘右
+along ref=缘右 group=粉 spacing=8 jitter=0.55
+
+curve [940,415 900,435 880,470 845,450 815,485 780,462 745,495 710,468 675,495 640,470] \
+      fill=none stroke=none name=尾左
+along ref=尾左 group=粉 spacing=13 jitter=0.8
+
+curve [260,415 300,435 320,470 355,450 385,485 420,462 455,495 490,468 525,495 560,470] \
+      fill=none stroke=none name=尾右
+along ref=尾右 group=粉 spacing=13 jitter=0.8
+
+# 翅面上也散一些（更稀）
+curve [660,420 760,400 850,400] fill=none stroke=none name=面左
+along ref=面左 group=粉 spacing=26 jitter=1
+curve [540,420 440,400 350,400] fill=none stroke=none name=面右
+along ref=面右 group=粉 spacing=26 jitter=1
+
+# ── 身体 ───────────────────────────────────────────
+ellipse 600,470,25,84 fill=#6E6152 stroke=$暗 width=2
+
+curve [600,404 600,522] fill=none stroke=none name=背路
+along ref=背路 group=粉 spacing=6 jitter=0.4
+
+# 胸节横纹
+curve [578,432 622,432] w=2 stroke=$暗 alpha=0.45
+curve [576,452 624,452] w=2 stroke=$暗 alpha=0.4
+curve [578,474 622,474] w=2 stroke=$暗 alpha=0.35
+
+# ── 头与触角 ───────────────────────────────────────
+ellipse 600,390,19,17 fill=#5E5245 stroke=$暗 width=2
+curve [588,378 566,338 550,302] w=2.4 stroke=$暗 taper=0.6
+curve [612,378 634,338 650,302] w=2.4 stroke=$暗 taper=0.6
+ellipse 550,300,3.5,3.5 fill=$暗
+ellipse 650,300,3.5,3.5 fill=$暗
+
+# ── 题字 ───────────────────────────────────────────
+text 90,850 "蛾 · 粉是撒上去的" 22 align=left color=#8B7E6B hand=0.3
